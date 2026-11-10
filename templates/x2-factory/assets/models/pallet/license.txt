@@ -1,0 +1,11 @@
+Model Information:
+* title:	EUR Pallet  .::RAWscan::.
+* source:	https://sketchfab.com/3d-models/eur-pallet-rawscan-f318b6e1cceb4473a1c35dc9196fd1a4
+* author:	Andrea Spognetta (Spogna) (https://sketchfab.com/spogna)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "EUR Pallet  .::RAWscan::." (https://sketchfab.com/3d-models/eur-pallet-rawscan-f318b6e1cceb4473a1c35dc9196fd1a4) by Andrea Spognetta (Spogna) (https://sketchfab.com/spogna) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

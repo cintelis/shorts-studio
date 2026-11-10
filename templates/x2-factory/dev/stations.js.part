@@ -1,0 +1,131 @@
+
+    const statM = (c) => new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: 0, roughness: 0.4 });
+    // ---- R2: CNC mill loader (mill front faces +x; bed ~0.78 m, ~0.3 m inside the door)
+    {
+      const rx = 5.95, rz = MILL.z, b = nb('mill', rx, rz, PI / 2); b.now = -9;
+      table(rx, rz - 0.62, 0, 0.9, 0.5, 0.74); table(rx, rz + 0.62, 0, 0.9, 0.5, 0.74);
+      millLamp = statM(0x39ff7a); const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.12, 16), millLamp); lamp.position.set(MILL.x + 1.0, 1.52, MILL.z - 0.75); world.add(lamp);
+      blk(0.03, 0.1, 0.03, steel, MILL.x + 1.0, 1.44, MILL.z - 0.75);
+      const runs = [];
+      for (let k = 0; k < 6; k++) {
+        const part = mkPart(), o = { mesh: part, ...PART };
+        const lat = [-0.22, 0.0, 0.22][k % 3];
+        b.turnTo(PI / 2); b.pick(o, frontOf(rx, rz, PI / 2, 0.42, 0.74, lat));
+        const j1 = b.cur; b.turnTo(PI); b.place(frontOf(rx, rz, PI, 0.62, 0.785));
+        const tRun = b.now; b.wait(2.6); runs.push([tRun, b.now]);
+        b.pick(o, frontOf(rx, rz, PI, 0.62, 0.785)); const j2 = b.cur;
+        b.turnTo(-PI / 2); b.place(frontOf(rx, rz, -PI / 2, 0.42, 0.74, lat));
+        o.visibleFrom = -1e9; objs.push({ o, job: j1, bot: b, job2: j2, bot2: b });
+      }
+      b.finish(TMAX); millRuns = runs;
+      ANCH.millBot = V3(rx, 1.0, rz);
+    }
+    // ---- R3: hydraulic press with two-hand buttons (press front faces +z; bed top ~0.63, rod travel ~0.3)
+    {
+      const rx = PRESS.x - 0.05, rz = PRESS.z + 0.6, b = nb('press', rx, rz, PI); b.now = -7;
+      const BED = 0.635;
+      table(rx - 0.62, rz + 0.1, 0, 0.5, 0.5, 0.7); table(rx + 0.62, rz + 0.1, 0, 0.5, 0.5, 0.7);
+      const btnM = new THREE.MeshStandardMaterial({ color: 0x1f8f3a, roughness: 0.4, emissive: 0x1f8f3a, emissiveIntensity: 0.2 });
+      const btn = [];
+      for (const sx of [-1, 1]) { blk(0.12, 0.16, 0.08, yel, rx + sx * 0.5, 1.0, PRESS.z + 0.42); const c = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.03, 20), btnM); c.rotation.x = PI / 2; c.position.set(rx + sx * 0.5, 1.0, PRESS.z + 0.475); world.add(c); btn.push(V3(rx + sx * 0.5, 1.02, PRESS.z + 0.49)); }
+      const hits = [];
+      let prev = null;
+      for (let k = 0; k < 6; k++) {
+        const part = mkPart(), o = { mesh: part, ...PART };
+        b.turnTo(PI); b.pick(o, frontOf(rx, rz, PI, 0.52, 0.7, 0.1)); const j1 = b.cur;
+        b.turnTo(PI / 2); b.place(frontOf(rx, rz, PI / 2, 0.36, BED));
+        const hj = b.hands(btn[0], btn[1], 1.7); hits.push([hj.tPick + 0.1, hj.tPlace]);
+        b.pick(o, frontOf(rx, rz, PI / 2, 0.36, BED)); const j2 = b.cur;
+        b.turnTo(0); b.place(frontOf(rx, rz, 0, 0.52, 0.7 + Math.min(k, 3) * 0.09 * 0.55, -0.1));
+        o.squashAt = hj.tPick + 0.6; o.visibleFrom = prev ? prev.job.tPick : -1e9;
+        if (k > 3) o.hideAfterT = j2.tEnd + 0.2;
+        prev = { o, job: j1, bot: b, job2: j2, bot2: b }; objs.push(prev);
+      }
+      b.finish(TMAX); pressHits = hits;
+      ANCH.pressBot = V3(rx, 1.0, rz);
+    }
+    // ---- R5: feeds parts to the cobot cell (arm bolted to the floor)
+    {
+      const ax = -4.6, az = 1.6, rx = ax - 1.35, rz = az, b = nb('cobot', rx, rz, 0); b.now = -5;
+      table(ax - 0.75, az, 0, 0.6, 0.8, 0.76);
+      blk(0.3, 0.03, 0.24, steelL, ax - 0.75, 0.775, az);
+      table(rx, rz + 0.62, 0, 0.8, 0.5, 0.74); table(rx, rz - 0.62, 0, 0.8, 0.5, 0.74);
+      for (let k = 0; k < 6; k++) {
+        const part = mkPart(), o = { mesh: part, ...PART };
+        const lat = [0.2, -0.2, 0][k % 3];
+        b.turnTo(-PI / 2); b.pick(o, frontOf(rx, rz, -PI / 2, 0.42, 0.74, lat)); const j1 = b.cur;
+        b.turnTo(0); b.place(frontOf(rx, rz, 0, 0.6, 0.79)); b.wait(2.2);
+        b.pick(o, frontOf(rx, rz, 0, 0.6, 0.79)); const j2 = b.cur;
+        b.turnTo(PI / 2); b.place(frontOf(rx, rz, PI / 2, 0.42, 0.74, lat));
+        o.visibleFrom = -1e9; objs.push({ o, job: j1, bot: b, job2: j2, bot2: b });
+      }
+      b.finish(TMAX); ANCH.cobotBot = V3(rx, 1.0, rz);
+    }
+    // ---- R6: inspection: lift each part to the head cameras, turn it, put it on the PASS tray
+    {
+      const rx = -2.3, rz = 1.55, b = nb('inspect', rx, rz, -PI / 2); b.now = -3;
+      table(rx, rz + 0.55, 0, 1.2, 0.5, 0.78);
+      scanMat = new THREE.MeshBasicMaterial({ color: 0x5fd8ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+      scanPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.26), scanMat); world.add(scanPlane);
+      const passM = new THREE.MeshStandardMaterial({ color: 0x2bb14c, roughness: 0.5 }), inM = new THREE.MeshStandardMaterial({ color: 0x3a3e44, roughness: 0.5 });
+      const at = (lat) => V3().setFromMatrixPosition(frontOf(rx, rz, -PI / 2, 0.48, 0.79, lat));
+      { const p = at(-0.35); blk(0.36, 0.02, 0.3, inM, p.x, p.y, p.z); } { const p = at(0.35); blk(0.36, 0.02, 0.3, passM, p.x, p.y, p.z); }
+      let prev = null;
+      for (let k = 0; k < 9; k++) {
+        const part = mkPart(), o = { mesh: part, ...PART };
+        b.pick(o, frontOf(rx, rz, -PI / 2, 0.48, 0.8, -0.35)); const j = b.cur;
+        const t0 = b.now; b.wait(2.4); const t1 = b.now;
+        j.carryFn = (t) => { const u = ss(t0 - 0.4, t0 + 0.3, t) * (1 - ss(t1 - 0.3, t1 + 0.4, t)), spin = ss(t0, t1 - 0.3, t) * PI;
+          return new THREE.Matrix4().makeTranslation(0.36 - 0.06 * u, 0.98 + 0.22 * u, 0).multiply(new THREE.Matrix4().makeRotationY(spin * u)).multiply(new THREE.Matrix4().makeBasis(V3(0, 0, 1), V3(0, 1, 0), V3(-1, 0, 0))); };
+        b.place(frontOf(rx, rz, -PI / 2, 0.48, 0.81, 0.35));
+        inspectJobs.push([t0, t1, b, j]);
+        o.visibleFrom = prev ? prev.job.tPick + 0.2 : -1e9;
+        o.hideAfterT = j.tEnd + 1.2;
+        prev = { o, job: j, bot: b }; objs.push(prev);
+      }
+      b.finish(TMAX); ANCH.inspectBot = V3(rx, 1.2, rz);
+    }
+    // ---- R4: shelving: carries boxes from a pallet to a steel shelf unit, walking the aisle
+    {
+      const ax = 8.95, zP = 1.0, zS = -3.0, b = nb('shelf', ax, zP, 0); b.now = -10;
+      const pal = palG.clone(true); pal.rotation.y = PI / 2; pal.position.set(ax + 0.95, 0, zP); world.add(pal);
+      const sx = ax + 0.62, shelfH = [0.32, 0.8, 1.28];
+      for (const z of [zS - 1.0, zS + 1.0]) for (const d of [0, 0.4]) blk(0.04, 1.6, 0.04, steel, sx + d, 0.8, z);
+      for (const h of shelfH) blk(0.44, 0.03, 2.04, tableTop, sx + 0.2, h - 0.015, zS);
+      const pre = [[0, -0.75], [0, -0.4], [2, 0.6], [2, 0.25], [0, 0.75], [2, -0.6], [1, 0.75]];
+      for (const [i, dz] of pre) { const m = mkBox('290x290x290_' + (1 + (i % 2))); m.position.set(sx + 0.2, shelfH[i], zS + dz); }
+      const src = [[0, -0.3], [0, 0.0], [0, 0.3], [1, -0.3], [1, 0.0], [1, 0.3]];
+      const dst = [-0.3, 0.05, 0.4, -0.65];
+      for (let k = 0; k < 3; k++) {
+        const [layer, lat] = src[5 - k];
+        const o = { mesh: mkBox('290x290x290_' + (1 + (k % 2))), ...BOX };
+        b.turnTo(0); b.pick(o, frontOf(ax, zP, 0, 0.55, 0.144 + layer * 0.29, lat)); const j = b.cur;
+        b.walkTo(ax, zS + dst[k], 0.5); b.turnTo(0);
+        b.place(objMat(V3(sx + 0.2, shelfH[1], zS + dst[k]), 0));
+        b.walkTo(ax, zP, 0.5);
+        o.visibleFrom = -1e9; objs.push({ o, job: j, bot: b });
+      }
+      for (let k = 3; k < 6; k++) { const [layer, lat] = src[5 - k]; const m = mkBox('290x290x290_' + (1 + (k % 2))); place(m, frontOf(ax, zP, 0, 0.55, 0.144 + layer * 0.29, lat)); }
+      b.finish(TMAX); ANCH.shelfBot = V3(ax, 1.0, -1);
+    }
+    // ---- R7: carries a crate down the main walkway (one long walk through the whole video)
+    {
+      const z = 4.25, b = nb('carry', -8.8, z, 0); b.now = -6;
+      const o = { mesh: mkCrate(), ...CRATE };
+      b.pick(o, frontOf(-8.8, z, 0, 0.42, 0.8)); const j = b.cur;
+      b.walkTo(14.0, z, 0.45);
+      objs.push({ o, job: j, bot: b }); b.finish(TMAX); carryBot = b;
+    }
+    // ---- R9: pushes a loaded cart along the cross aisle
+    {
+      const x = 7.67, b = nb('cart', x, -15.5, -PI / 2); b.now = -2;
+      cart = new THREE.Group(); world.add(cart);
+      blk(1.0, 0.04, 0.62, steel, 0.6, 0.26, 0, cart);
+      for (const sx of [0.15, 1.05]) for (const sz of [-0.27, 0.27]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.04, 20), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.7 })); w.rotation.x = PI / 2; w.position.set(sx, 0.07, sz); cart.add(w); blk(0.03, 0.15, 0.03, steel, sx, 0.17, sz, cart); }
+      for (const sz of [-0.27, 0.27]) blk(0.03, 0.75, 0.03, steel, 0.12, 0.62, sz, cart);
+      blk(0.035, 0.035, 0.6, steelL, 0.12, 0.98, 0, cart);
+      for (let i = 0; i < 4; i++) { const c = crateT.clone(true); c.position.set(i < 2 ? 0.4 : 0.82, 0.28 + (i % 2) * 0.232, 0); c.rotation.y = PI / 2; cart.add(c); }
+      cart.traverse((m) => { if (m.isMesh) m.castShadow = m.receiveShadow = true; });
+      b.handsLocal(V3(0.4, 0.98, -0.2), V3(0.4, 0.98, 0.2), TMAX);
+      b.walkTo(x, 7.5, 0.45); b.finish(TMAX); cartBot = b;
+    }

@@ -1,0 +1,27 @@
+{
+ "music": [
+  {
+   "file": "music-x2v2.mp3",
+   "plan": {
+    "positive_global_styles": ["modern electronic instrumental", "driving industrial groove", "clean synth pulses", "tight punchy drums", "tech documentary energy", "around 116 bpm", "documentary short under narration", "leaves room for a voiceover", "confident"],
+    "negative_global_styles": ["vocals", "lyrics", "acoustic guitar", "lo-fi", "jazz", "busy melody", "dubstep", "horror"],
+    "sections": [
+     {"section_name": "Hook", "duration_ms": 5300, "lines": [], "positive_local_styles": ["big impact hit on the first beat", "mechanical rhythm from the start", "sharp start"], "negative_local_styles": ["silence", "soft intro"]},
+     {"section_name": "Station tour", "duration_ms": 15000, "lines": [], "positive_local_styles": ["steady production line groove", "metallic percussion", "rhythmic and busy"], "negative_local_styles": ["drop out"]},
+     {"section_name": "Contrast", "duration_ms": 5000, "lines": [], "positive_local_styles": ["brief breakdown", "pulse continues", "curious"], "negative_local_styles": ["silence"]},
+     {"section_name": "Why", "duration_ms": 11300, "lines": [], "positive_local_styles": ["building", "rising synth swell", "momentum"], "negative_local_styles": ["chaotic"]},
+     {"section_name": "Proof and payoff", "duration_ms": 9000, "lines": [], "positive_local_styles": ["full groove", "wide uplifting chords", "big finish"], "negative_local_styles": ["soft"]},
+     {"section_name": "End", "duration_ms": 3000, "lines": [], "positive_local_styles": ["final hit then ring out", "resolving ending"], "negative_local_styles": ["abrupt cut"]}
+    ]
+   }
+  }
+ ],
+ "sfx": [
+  {"file": "hum.mp3", "text": "busy factory floor ambience, conveyor motors humming, distant machinery, soft clanks, steady", "seconds": 22, "influence": 0.5, "loop": true},
+  {"file": "servo.mp3", "text": "small humanoid robot servo motors whirring briefly, quiet precise electric actuator sound", "seconds": 1.5, "influence": 0.6},
+  {"file": "clunk.mp3", "text": "plastic crate set down on a stack, short hollow knock", "seconds": 0.8, "influence": 0.6},
+  {"file": "press.mp3", "text": "hydraulic press stroke, hiss then heavy metal thump, short", "seconds": 1.8, "influence": 0.6},
+  {"file": "mill.mp3", "text": "CNC milling machine spindle spinning up and cutting metal, short", "seconds": 2.5, "influence": 0.6},
+  {"file": "beep.mp3", "text": "short clean scanner confirmation beep", "seconds": 0.5, "influence": 0.6}
+ ]
+}

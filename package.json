@@ -1,0 +1,12 @@
+{
+  "name": "shorts-studio",
+  "private": true,
+  "type": "module",
+  "description": "Templates and tools for code-built 3D YouTube Shorts (HyperFrames + three.js + ElevenLabs)",
+  "scripts": {
+    "serve": "npx --yes http-server . -p 8765 -c-1 --cors"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^24.0.0"
+  }
+}

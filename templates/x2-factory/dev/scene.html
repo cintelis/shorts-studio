@@ -1,0 +1,16 @@
+<!doctype html><html><body style="margin:0;background:#000"><div style="position:relative;width:1080px;height:1920px"><canvas id="c" width="1080" height="1920" style="position:absolute"></canvas><canvas id="o" width="1080" height="1920" style="position:absolute"></canvas></div>
+<script src="../lib/layout.js"></script>
+<script type="module">
+import { createX2 } from '../lib/x2.js';
+const m = createX2(document.getElementById('c'), document.getElementById('o'), { width: 1080, height: 1920 });
+await m.load('../assets/');
+const s = Object.assign({ t: 0, rev: 99, ghost: 0 }, JSON.parse(decodeURIComponent(location.hash.slice(1) || '{}')));
+if (s.D) s.logD = Math.log(s.D);
+const t0 = performance.now(); m.render(s); const dt = performance.now() - t0;
+// composite overlay onto the webgl canvas for the screenshot
+const c = document.getElementById('c'), o = document.getElementById('o');
+const out = document.createElement('canvas'); out.width = 1080; out.height = 1920; const g = out.getContext('2d'); g.drawImage(c, 0, 0); g.drawImage(o, 0, 0);
+document.body.innerHTML = ''; document.body.appendChild(out);
+window.__info = JSON.stringify({ ms: Math.round(dt), dbg: window.__dbg });
+window.__done = 1;
+</script></body></html>

@@ -1,0 +1,9 @@
+    if (millLamp) { const on = millRuns.some(([a, b]) => t > a + 0.2 && t < b - 0.1); millLamp.emissiveIntensity = on ? 3.0 : 0.15; }
+    if (pressRod) { let d = 0; for (const [a, b] of pressHits) d = Math.max(d, ss(a, a + 0.45, t) * (1 - ss(b - 0.55, b - 0.1, t))); pressRod.position.y = -0.3 * d; }
+    if (scanPlane) {
+      let on = 0, Mx = null;
+      for (const [a, b2, bot, j] of inspectJobs) if (t > a && t < b2) { on = Math.sin(PI * clamp01((t - a) / (b2 - a))); Mx = bot.objAt(j, t); }
+      scanMat.opacity = 0.35 * on; scanPlane.visible = on > 0.01;
+      if (Mx) { const p = V3().setFromMatrixPosition(Mx); scanPlane.position.copy(p).add(V3(0, 0.05 + 0.08 * Math.sin(t * 9), 0)); scanPlane.rotation.set(-PI / 2, 0, 0); }
+    }
+    if (cart && cartBot) { const B = cartBot.baseAt(t); cart.position.set(B.x, 0, B.z); cart.rotation.y = B.yaw; }

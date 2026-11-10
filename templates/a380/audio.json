@@ -1,0 +1,25 @@
+{
+ "music": [
+  {
+   "file": "music-a380.mp3",
+   "plan": {
+    "positive_global_styles": ["cinematic hybrid orchestral electronic instrumental", "warm wide synth pads", "tight punchy drums", "aviation documentary energy", "around 100 bpm", "documentary short under narration", "leaves room for a voiceover"],
+    "negative_global_styles": ["vocals", "lyrics", "acoustic guitar", "lo-fi", "jazz", "busy melody", "dubstep"],
+    "sections": [
+     {"section_name": "Hook", "duration_ms": 4400, "lines": [], "positive_local_styles": ["big impact hit on the first beat", "majestic soaring brass-like synth", "sharp start"], "negative_local_styles": ["silence", "soft intro"]},
+     {"section_name": "Giant", "duration_ms": 12500, "lines": [], "positive_local_styles": ["proud heroic swell", "steady driving pulse", "sense of huge scale"], "negative_local_styles": ["drop out"]},
+     {"section_name": "Bet", "duration_ms": 10000, "lines": [], "positive_local_styles": ["thoughtful ticking synth arpeggio", "rising tension", "strategy game feel"], "negative_local_styles": ["chaotic"]},
+     {"section_name": "Cost", "duration_ms": 7000, "lines": [], "positive_local_styles": ["darker turn", "heavy low pulse", "mechanical ticking"], "negative_local_styles": ["happy", "quiet"]},
+     {"section_name": "End", "duration_ms": 9300, "lines": [], "positive_local_styles": ["bittersweet nostalgic swell", "slow wide pads with soft drums"], "negative_local_styles": ["abrupt cut"]},
+     {"section_name": "Outro", "duration_ms": 4800, "lines": [], "positive_local_styles": ["final big hit then ring out", "resolving ending"], "negative_local_styles": ["abrupt cut"]}
+    ]
+   }
+  }
+ ],
+ "sfx": [
+  {"file": "takeoff.mp3", "text": "large four engine jet airliner at full takeoff thrust rolling down the runway, deep powerful turbofan roar, heard from beside the runway", "seconds": 6, "influence": 0.6},
+  {"file": "flyby.mp3", "text": "jet airliner flying past overhead, smooth deep whoosh with doppler, turbofan hum", "seconds": 4, "influence": 0.6},
+  {"file": "cruise.mp3", "text": "steady distant high altitude jet airliner engine hum and soft wind, continuous", "seconds": 20, "influence": 0.5, "loop": true},
+  {"file": "sting.mp3", "text": "cinematic orchestral trailer ending: one huge deep boom hit with low brass and long reverb tail ringing out", "seconds": 4.5, "influence": 0.6}
+ ]
+}

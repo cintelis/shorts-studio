@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root { --ground: #07080b; --ink: #f6f2ee; --muted: #d9d4ce; --cyan: #5fd8ff; --lime: #c6ff3d; --red: #ff5a3c;
+              --font-display: "Oswald"; --font-cap: "Montserrat"; --font-mono: "JetBrains Mono"; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: var(--font-display); color: var(--ink); }
+      #bg { position: absolute; inset: 0; background: #000; }
+      #stage { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      #scrim { position: absolute; left: 0; top: 0; width: 1080px; height: 620px; background: linear-gradient(180deg, rgba(4,5,7,0.62) 0%, rgba(4,5,7,0.3) 62%, rgba(4,5,7,0) 100%); }
+      #scrimB { position: absolute; left: 0; top: 1380px; width: 1080px; height: 540px; background: linear-gradient(0deg, rgba(4,5,7,0.5) 0%, rgba(4,5,7,0) 100%); }
+      #endscrim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: rgba(5,6,8,0.8); }
+
+      #hook { position: absolute; left: 30px; right: 30px; top: 120px; text-align: center; text-transform: uppercase; text-shadow: 0 6px 30px rgba(0,0,0,0.9); }
+      #hook .row { font-size: 168px; line-height: 0.98; font-weight: 700; color: #fff; }
+      #hook .row b { color: var(--lime); font-weight: 700; }
+      #hook .sub { font-family: var(--font-mono); font-size: 46px; font-weight: 700; letter-spacing: 0.12em; color: #fff; margin-top: 22px; }
+      #hook .sub em { font-style: normal; color: var(--lime); }
+
+      .cw { position: absolute; left: 30px; right: 30px; top: 1530px; text-align: center; }
+      .cw span { display: inline-block; font-family: var(--font-cap); font-weight: 900; font-size: 84px; line-height: 1.05; color: #fff;
+                 -webkit-text-stroke: 14px #000; paint-order: stroke fill; letter-spacing: 0.01em; text-shadow: 0 8px 22px rgba(0,0,0,0.55); }
+      .cw b { color: var(--lime); font-weight: 900; }
+
+      .call { position: absolute; left: 50px; right: 50px; top: 120px; text-align: center; text-shadow: 0 6px 28px rgba(0,0,0,0.9); }
+      .call .k { font-family: var(--font-mono); font-size: 36px; letter-spacing: 0.14em; color: var(--muted); font-weight: 700; }
+      .call .big { font-size: 128px; font-weight: 700; line-height: 1; margin-top: 6px; color: #fff; }
+      .call .big b { color: var(--lime); font-weight: 700; }
+
+      #end { position: absolute; left: 60px; right: 60px; top: 640px; text-align: center; text-shadow: 0 4px 24px rgba(0,0,0,0.85); }
+      #end .t { font-size: 124px; font-weight: 700; line-height: 0.98; letter-spacing: 0.01em; color: #fff; }
+      #end .t b { color: var(--lime); }
+      #end .cta { display: inline-flex; align-items: center; margin-top: 56px; }
+      #end .cta .sub { font-family: var(--font-mono); font-size: 38px; font-weight: 700; letter-spacing: 0.06em; color: #fff; background: #ff0033; border-radius: 44px; padding: 14px 38px; box-shadow: 0 6px 24px rgba(255,0,51,0.45); }
+      #end .d { font-family: var(--font-mono); font-size: 28px; color: var(--muted); margin-top: 60px; line-height: 1.4; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="48.78" data-width="1080" data-height="1920">
+      <div id="bg" class="clip" data-start="0" data-duration="48.78" data-track-index="0"></div>
+      <canvas id="stage" class="clip" data-start="0" data-duration="48.78" data-track-index="1" width="1080" height="1920"></canvas>
+      <div id="scrim" class="clip" data-start="0" data-duration="48.78" data-track-index="5" data-layout-ignore></div>
+      <div id="scrimB" class="clip" data-start="0" data-duration="48.78" data-track-index="5" data-layout-ignore></div>
+      <div id="endscrim" class="clip" data-start="46.18" data-duration="2.6" data-track-index="5" data-layout-ignore></div>
+
+      <div id="hook" class="clip" data-start="0.0" data-duration="5.378" data-track-index="2">
+        <div class="row" id="hook-a">NO ONE HERE</div>
+        <div class="row" id="hook-b">IS <b>HUMAN.</b></div>
+        <div class="sub" id="hook-sub"><em>10</em> ROBOTS · <em>10</em> JOBS</div>
+      </div>
+      <div id="c-line" class="clip call" data-start="5.378" data-duration="3.344" data-track-index="2"><div class="k" id="c-line-k">CONVEYOR</div><div class="big" id="c-line-big">PICK &amp; <b>STACK</b></div></div>
+      <div id="c-mill" class="clip call" data-start="8.722" data-duration="2.241" data-track-index="2"><div class="k" id="c-mill-k">CNC MILL</div><div class="big" id="c-mill-big">MACHINE <b>LOADING</b></div></div>
+      <div id="c-press" class="clip call" data-start="10.963" data-duration="3.227" data-track-index="2"><div class="k" id="c-press-k">HYDRAULIC PRESS</div><div class="big" id="c-press-big">TWO-HAND <b>START</b></div></div>
+      <div id="c-shelf" class="clip call" data-start="14.19" data-duration="1.939" data-track-index="2"><div class="k" id="c-shelf-k">WAREHOUSE</div><div class="big" id="c-shelf-big"><b>SHELVING</b></div></div>
+      <div id="c-insp" class="clip call" data-start="16.129" data-duration="1.788" data-track-index="2"><div class="k" id="c-insp-k">QUALITY</div><div class="big" id="c-insp-big"><b>INSPECTION</b></div></div>
+      <div id="c-cobot" class="clip call" data-start="17.917" data-duration="2.508" data-track-index="2"><div class="k" id="c-cobot-k">ROBOT CELL</div><div class="big" id="c-cobot-big">FEEDS THE <b>ARM</b></div></div>
+      <div id="c-bolt" class="clip call" data-start="20.425" data-duration="2.206" data-track-index="2"><div class="k" id="c-bolt-k">ROBOT ARM</div><div class="big" id="c-bolt-big">BOLTED <b>IN PLACE</b></div></div>
+      <div id="c-walk" class="clip call" data-start="22.631" data-duration="2.74" data-track-index="2"><div class="k" id="c-walk-k">HUMANOID</div><div class="big" id="c-walk-big">WALKS TO <b>THE NEXT JOB</b></div></div>
+      <div id="c-why" class="clip call" data-start="25.371" data-duration="4.214" data-track-index="2"><div class="k" id="c-why-k">WHY A HUMAN SHAPE?</div><div class="big" id="c-why-big">BUILT FOR <b>PEOPLE</b></div></div>
+      <div id="c-btn" class="clip call" data-start="29.585" data-duration="0.65" data-track-index="2"><div class="k" id="c-btn-k">MADE FOR HANDS</div><div class="big" id="c-btn-big"><b>BUTTONS</b></div></div>
+      <div id="c-door" class="clip call" data-start="30.235" data-duration="0.778" data-track-index="2"><div class="k" id="c-door-k">MADE FOR HANDS</div><div class="big" id="c-door-big"><b>DOORS</b></div></div>
+      <div id="c-shv" class="clip call" data-start="31.013" data-duration="1.184" data-track-index="2"><div class="k" id="c-shv-k">MADE FOR HANDS</div><div class="big" id="c-shv-big"><b>SHELVES</b></div></div>
+      <div id="c-same" class="clip call" data-start="32.197" data-duration="4.365" data-track-index="2"><div class="k" id="c-same-k">SAME MACHINES</div><div class="big" id="c-same-big">NO <b>REBUILD</b></div></div>
+      <div id="c-cars" class="clip call" data-start="36.562" data-duration="6.717" data-track-index="2"><div class="k" id="c-cars-k">CAR MAKERS</div><div class="big" id="c-cars-big">ALREADY <b>TESTING</b></div></div>
+
+      <div id="end" class="clip" data-start="46.18" data-duration="2.6" data-track-index="2">
+        <div class="t" id="end-t">SAME FACTORY.<br><b>NEW WORKERS.</b></div>
+        <div class="cta" id="end-cta"><span class="sub" id="end-sub">SUBSCRIBE</span></div>
+        <div class="d" id="end-d">Unofficial visualisation · demonstration factory</div>
+      </div>
+
+      <!-- word-by-word captions, timed from the ElevenLabs voice alignment -->
+      <div id="cw-0" class="clip cw" data-start="2.294" data-duration="1.405" data-track-index="9"><span id="cw-0-t"><b>TEN</b> ROBOTS.</span></div>
+      <div id="cw-1" class="clip cw" data-start="3.699" data-duration="1.729" data-track-index="9"><span id="cw-1-t">TEN DIFFERENT <b>JOBS.</b></span></div>
+      <div id="cw-2" class="clip cw" data-start="5.428" data-duration="0.802" data-track-index="9"><span id="cw-2-t">THIS ONE TAKES</span></div>
+      <div id="cw-3" class="clip cw" data-start="6.23" data-duration="1.207" data-track-index="9"><span id="cw-3-t">CRATES OFF THE LINE,</span></div>
+      <div id="cw-4" class="clip cw" data-start="7.437" data-duration="1.335" data-track-index="9"><span id="cw-4-t">AND <b>STACKS</b> THEM.</span></div>
+      <div id="cw-5" class="clip cw" data-start="8.772" data-duration="1.045" data-track-index="9"><span id="cw-5-t">THIS ONE LOADS</span></div>
+      <div id="cw-6" class="clip cw" data-start="9.817" data-duration="1.196" data-track-index="9"><span id="cw-6-t">THE <b>MILLING MACHINE.</b></span></div>
+      <div id="cw-7" class="clip cw" data-start="11.013" data-duration="0.894" data-track-index="9"><span id="cw-7-t">THIS ONE RUNS</span></div>
+      <div id="cw-8" class="clip cw" data-start="11.907" data-duration="0.522" data-track-index="9"><span id="cw-8-t">THE <b>PRESS,</b></span></div>
+      <div id="cw-9" class="clip cw" data-start="12.429" data-duration="0.871" data-track-index="9"><span id="cw-9-t">WITH BOTH HANDS</span></div>
+      <div id="cw-10" class="clip cw" data-start="13.3" data-duration="0.94" data-track-index="9"><span id="cw-10-t">ON THE <b>BUTTONS.</b></span></div>
+      <div id="cw-11" class="clip cw" data-start="14.24" data-duration="0.918" data-track-index="9"><span id="cw-11-t">THIS ONE STOCKS</span></div>
+      <div id="cw-12" class="clip cw" data-start="15.158" data-duration="1.021" data-track-index="9"><span id="cw-12-t">THE <b>SHELVES.</b></span></div>
+      <div id="cw-13" class="clip cw" data-start="16.179" data-duration="0.778" data-track-index="9"><span id="cw-13-t">THIS ONE <b>CHECKS</b></span></div>
+      <div id="cw-14" class="clip cw" data-start="16.957" data-duration="1.01" data-track-index="9"><span id="cw-14-t">EVERY PART.</span></div>
+      <div id="cw-15" class="clip cw" data-start="17.967" data-duration="0.697" data-track-index="9"><span id="cw-15-t">AND THIS ONE</span></div>
+      <div id="cw-16" class="clip cw" data-start="18.664" data-duration="1.811" data-track-index="9"><span id="cw-16-t">FEEDS A <b>ROBOT ARM.</b></span></div>
+      <div id="cw-17" class="clip cw" data-start="20.475" data-duration="0.813" data-track-index="9"><span id="cw-17-t">THAT ARM IS</span></div>
+      <div id="cw-18" class="clip cw" data-start="21.288" data-duration="1.393" data-track-index="9"><span id="cw-18-t"><b>BOLTED</b> IN PLACE.</span></div>
+      <div id="cw-19" class="clip cw" data-start="22.681" data-duration="0.859" data-track-index="9"><span id="cw-19-t">THE HUMANOID</span></div>
+      <div id="cw-20" class="clip cw" data-start="23.54" data-duration="0.488" data-track-index="9"><span id="cw-20-t">CAN <b>WALK</b></span></div>
+      <div id="cw-21" class="clip cw" data-start="24.028" data-duration="1.393" data-track-index="9"><span id="cw-21-t">TO THE NEXT JOB.</span></div>
+      <div id="cw-22" class="clip cw" data-start="25.421" data-duration="2.078" data-track-index="9"><span id="cw-22-t">WHY A <b>HUMAN SHAPE?</b></span></div>
+      <div id="cw-23" class="clip cw" data-start="27.499" data-duration="0.882" data-track-index="9"><span id="cw-23-t">BECAUSE FACTORIES</span></div>
+      <div id="cw-24" class="clip cw" data-start="28.381" data-duration="1.254" data-track-index="9"><span id="cw-24-t">ARE BUILT FOR <b>PEOPLE:</b></span></div>
+      <div id="cw-25" class="clip cw" data-start="29.635" data-duration="0.65" data-track-index="9"><span id="cw-25-t">THE <b>BUTTONS,</b></span></div>
+      <div id="cw-26" class="clip cw" data-start="30.285" data-duration="0.778" data-track-index="9"><span id="cw-26-t">THE <b>DOORS,</b></span></div>
+      <div id="cw-27" class="clip cw" data-start="31.063" data-duration="1.184" data-track-index="9"><span id="cw-27-t">THE <b>SHELVES.</b></span></div>
+      <div id="cw-28" class="clip cw" data-start="32.247" data-duration="1.01" data-track-index="9"><span id="cw-28-t">A ROBOT SHAPED</span></div>
+      <div id="cw-29" class="clip cw" data-start="33.257" data-duration="0.708" data-track-index="9"><span id="cw-29-t">LIKE US</span></div>
+      <div id="cw-30" class="clip cw" data-start="33.965" data-duration="0.766" data-track-index="9"><span id="cw-30-t">CAN USE THEM</span></div>
+      <div id="cw-31" class="clip cw" data-start="34.731" data-duration="0.906" data-track-index="9"><span id="cw-31-t">WITHOUT <b>REBUILDING</b></span></div>
+      <div id="cw-32" class="clip cw" data-start="35.637" data-duration="0.975" data-track-index="9"><span id="cw-32-t">THE FACTORY.</span></div>
+      <div id="cw-33" class="clip cw" data-start="36.612" data-duration="0.836" data-track-index="9"><span id="cw-33-t">CAR MAKERS ARE</span></div>
+      <div id="cw-34" class="clip cw" data-start="37.448" data-duration="1.533" data-track-index="9"><span id="cw-34-t">ALREADY <b>TESTING</b> THIS.</span></div>
+      <div id="cw-35" class="clip cw" data-start="38.981" data-duration="1.555" data-track-index="9"><span id="cw-35-t"><b>BMW</b> HAS TRIALLED</span></div>
+      <div id="cw-36" class="clip cw" data-start="40.536" data-duration="0.755" data-track-index="9"><span id="cw-36-t">A HUMANOID</span></div>
+      <div id="cw-37" class="clip cw" data-start="41.291" data-duration="1.068" data-track-index="9"><span id="cw-37-t">PLACING <b>SHEET-METAL</b></span></div>
+      <div id="cw-38" class="clip cw" data-start="42.359" data-duration="0.95" data-track-index="9"><span id="cw-38-t">PARTS.</span></div>
+      <div id="cw-39" class="clip cw" data-start="43.329" data-duration="1.231" data-track-index="9"><span id="cw-39-t">SAME FACTORY.</span></div>
+      <div id="cw-40" class="clip cw" data-start="44.56" data-duration="1.516" data-track-index="9"><span id="cw-40-t"><b>NEW WORKERS.</b></span></div>
+
+      <!-- Voiceover (ElevenLabs "Adam"), ducked music, sound effects -->
+      <audio id="a-voice" class="clip" src="assets/voice/voice.mp3" data-start="0.0" data-duration="46.13" data-volume="1.0" data-track-index="20"></audio>
+      <audio id="m-a" class="clip" src="assets/audio/music-x2v2-duck.mp3" data-start="0.0" data-duration="48.78" data-volume="0.72" data-fade-out="0.8" data-track-index="21"></audio>
+      <audio id="a-hum" class="clip" src="assets/audio/hum-long.mp3" data-start="0.0" data-duration="48.78" data-volume="0.3" data-fade-out="1.0" data-track-index="22"></audio>
+      <audio id="a-servo" class="clip" src="assets/audio/servo.mp3" data-start="5.58" data-duration="1.5" data-volume="0.45" data-fade-out="0.3" data-track-index="23"></audio>
+      <audio id="a-clk" class="clip" src="assets/audio/clunk.mp3" data-start="7.72" data-duration="0.8" data-volume="0.55" data-track-index="24"></audio>
+      <audio id="a-mill" class="clip" src="assets/audio/mill.mp3" data-start="9.92" data-duration="2.5" data-volume="0.4" data-fade-out="0.6" data-track-index="25"></audio>
+      <audio id="a-press" class="clip" src="assets/audio/press.mp3" data-start="13.3" data-duration="1.8" data-volume="0.55" data-fade-out="0.3" data-track-index="26"></audio>
+      <audio id="a-beep" class="clip" src="assets/audio/beep.mp3" data-start="16.9" data-duration="0.5" data-volume="0.35" data-track-index="27"></audio>
+      <audio id="a-servo2" class="clip" src="assets/audio/servo.mp3" data-start="18.6" data-duration="1.5" data-volume="0.4" data-fade-out="0.3" data-track-index="28"></audio>
+      <audio id="a-press2" class="clip" src="assets/audio/press.mp3" data-start="30.25" data-duration="1.8" data-volume="0.45" data-fade-out="0.3" data-track-index="29"></audio>
+    </div>
+
+    <script src="lib/sync.js"></script>
+    <script>
+      const DUR = 48.78, LN = Math.log, TL = {"ten": 2.294, "line": 5.378, "mill": 8.722, "press": 10.963, "shelf": 14.19, "inspect": 16.129, "cobot": 17.917, "bolted": 20.425, "walk": 22.631, "why": 25.371, "buttons": 29.585, "doors": 30.235, "shelves": 31.013, "shaped": 32.197, "cars": 36.562, "boxes": 38.931, "same": 43.279, "end": 46.18, "endd": 2.6};
+      const S = { t: 0, tx: 1.2, ty: 0, tz: -1.2, camAz: -35, camEl: 44, logD: LN(17), fov: 44, cut: 1, ao: 1, bloom: 0.3, aperture: 0, focus: 0, maxblur: 0.006, exp: 1 };
+      const st = gsap.timeline({ paused: true });
+      const to = (t, d, props, ease = "sine.inOut") => st.to(S, { ...props, duration: Math.max(0.01, d), ease }, t);
+      const set = (t, props) => st.set(S, props, t);
+      const shot = (t0, t1, a, b, ease = "sine.inOut") => { const A = { ...a }, B = { ...b }; if (A.D) { A.logD = LN(A.D); delete A.D; } if (B.D) { B.logD = LN(B.D); delete B.D; } set(t0, { cut: 0, fov: 32, ...A }); to(t0, t1 - t0, B, ease); };
+      const r7x = (t) => -8.8 + 0.45 * (t + 4.55), r9z = (t) => -15.5 + 0.45 * (t + 2);
+
+      shot(0, TL.line, { cut: 1, tx: 1.8, ty: 0, tz: -0.8, camAz: -62, camEl: 38, D: 16, fov: 46 }, { camAz: -50, camEl: 35, D: 14.2 });
+      shot(TL.line, TL.mill, { tx: 1.6, ty: 0.85, tz: -1.0, camAz: 34, camEl: 12, D: 4.1 }, { camAz: 22, D: 3.8 });
+      shot(TL.mill, TL.press, { tx: 5.7, ty: 1.0, tz: -3.45, camAz: -45, camEl: 10, D: 3.5 }, { camAz: -40, D: 3.3 });
+      shot(TL.press, TL.shelf, { tx: 4.55, ty: 0.95, tz: 1.3, camAz: 108, camEl: 22, D: 3.4 }, { camAz: 100, D: 3.15 });
+      shot(TL.shelf, TL.inspect, { tx: 9.5, ty: 0.95, tz: -0.6, camAz: -112, camEl: 11, D: 3.7 }, { camAz: -100, D: 3.45 });
+      shot(TL.inspect, TL.cobot, { tx: -2.05, ty: 0.95, tz: 1.55, camAz: 14, camEl: 8, D: 3.2 }, { camAz: 6, D: 3.0 });
+      shot(TL.cobot, TL.bolted, { tx: -5.2, ty: 0.95, tz: 1.6, camAz: 28, camEl: 12, D: 3.9 }, { camAz: 38, D: 3.6 });
+      shot(TL.bolted, TL.walk, { tx: -4.75, ty: 0.95, tz: 1.5, camAz: 140, camEl: 16, D: 2.3 }, { ty: 0.85, D: 2.05 });
+      shot(TL.walk, TL.why, { tx: r7x(TL.walk) + 0.3, ty: 0.85, tz: 4.25, camAz: 58, camEl: 8, D: 4.4 }, { tx: r7x(TL.why) + 0.3, camAz: 40 }, "none");
+      shot(TL.why, TL.buttons, { tx: 2.0, ty: 0.6, tz: -0.8, camAz: -18, camEl: 18, D: 9.5, fov: 38 }, { camAz: -6, D: 8.6 });
+      shot(TL.buttons, TL.doors, { tx: 4.55, ty: 1.0, tz: 1.3, camAz: 112, camEl: 24, D: 2.7 }, { D: 2.5 });
+      shot(TL.doors, TL.shelves, { tx: 5.68, ty: 1.02, tz: -3.45, camAz: -44, camEl: 10, D: 3.1 }, { D: 2.95 });
+      shot(TL.shelves, TL.shaped, { tx: 9.6, ty: 0.95, tz: -0.5, camAz: -150, camEl: 12, D: 3.6 }, { tz: 0.1, camAz: -142, D: 3.4 });
+      shot(TL.shaped, TL.cars, { tx: 1.0, ty: 0.5, tz: -1.0, camAz: -62, camEl: 16, D: 11, fov: 40 }, { camAz: -28, camEl: 22, D: 10 });
+      shot(TL.cars, TL.boxes, { tx: 7.67, ty: 0.85, tz: r9z(TL.cars) + 0.6, camAz: 6, camEl: 8, D: 5.2 }, { tz: r9z(TL.boxes) + 0.6, camAz: 16 }, "none");
+      shot(TL.boxes, TL.same, { tx: -2.75, ty: 0.85, tz: -6.0, camAz: -48, camEl: 12, D: 4.4 }, { camAz: -58, D: 4.1 });
+      shot(TL.same, DUR, { cut: 1, tx: 1.8, ty: 0.2, tz: -0.8, camAz: -40, camEl: 22, D: 9, fov: 44 }, { camAz: -58, camEl: 38, D: 16 }, "sine.inOut");
+      st.set({}, {}, DUR);
+      window.x2StateAt = (t) => { st.seek(t, false); return { ...S, t }; };
+
+      // ---------- Text ----------
+      const tl = gsap.timeline({ paused: true });
+      const fade = (sel, t, d = 0.3) => tl.fromTo(sel, { opacity: 0 }, { opacity: 1, duration: d }, t);
+      tl.fromTo("#hook-a", { scale: 1.06, y: -20 }, { scale: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.0);
+      tl.fromTo("#hook-b", { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" }, 0.75);
+      tl.fromTo("#hook-sub", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, TL.ten);
+      [2.294, 3.699, 5.428, 6.23, 7.437, 8.772, 9.817, 11.013, 11.907, 12.429, 13.3, 14.24, 15.158, 16.179, 16.957, 17.967, 18.664, 20.475, 21.288, 22.681, 23.54, 24.028, 25.421, 27.499, 28.381, 29.635, 30.285, 31.063, 32.247, 33.257, 33.965, 34.731, 35.637, 36.612, 37.448, 38.981, 40.536, 41.291, 42.359, 43.329, 44.56].forEach((t, k) => tl.fromTo(`#cw-${k}-t`, { scale: 0.86 }, { scale: 1, duration: 0.12, ease: "back.out(2)" }, t));
+      for (const [k, t] of Object.entries({"c-line": 5.378, "c-mill": 8.722, "c-press": 10.963, "c-shelf": 14.19, "c-insp": 16.129, "c-cobot": 17.917, "c-bolt": 20.425, "c-walk": 22.631, "c-why": 25.371, "c-btn": 29.585, "c-door": 30.235, "c-shv": 31.013, "c-same": 32.197, "c-cars": 36.562})) { tl.fromTo(`#${k}-k`, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.12, ease: "power3.out" }, t); tl.fromTo(`#${k}-big`, { opacity: 0, scale: 1.15 }, { opacity: 1, scale: 1, duration: 0.12, ease: "power3.out" }, t); }
+      tl.fromTo("#endscrim", { opacity: 0 }, { opacity: 1, duration: 0.4 }, TL.end);
+      tl.fromTo("#end-t", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, TL.end + 0.05);
+      tl.fromTo("#end-cta", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, TL.end + 0.5);
+      fade("#end-d", TL.end + 0.3);
+      tl.set({}, {}, DUR);
+
+      window.__hf = window.__hf || {};
+      window.__hf.buildReady = window.__hf.buildReady || {};
+      window.__hf.buildReady.x2 = new Promise((resolve) => { window.__x2Ready = resolve; });
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+    <script type="module">
+      import { createFactory } from "./lib/factory.js";
+      const m = createFactory(document.getElementById("stage"), { width: 1080, height: 1920 });
+      let loaded = false, pending = 0;
+      const renderAt = (t) => { pending = t; if (!loaded) return; m.render(window.x2StateAt(t)); };
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      await m.load("assets/");
+      loaded = true;
+      renderAt(pending);
+      window.__x2Ready();
+    </script>
+  </body>
+</html>

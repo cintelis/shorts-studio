@@ -1,0 +1,127 @@
+    // ---- R2: CNC mill loader (mill front faces +x; bed ~0.785 m, ~0.3 m inside the door). Cycle 20.7 s.
+    { ST = 'mill';
+      AUD.sups.push({ M: new THREE.Matrix4().makeTranslation(5.2, 0.785 - 0.05, MILL.z), h: [0.25, 0.05, 0.3], name: 'mill-bed' });
+      const rx = 5.95, rz = MILL.z, b = nb('mill', rx, rz, PI / 2); b.now = -36; const P = 20.7, TH = 0.74, PH_ = 0.14;
+      table(rx, rz - 0.62, 0, 0.9, 0.5, TH); table(rx, rz + 0.62, 0, 0.9, 0.5, TH);
+      millLamp = statM(0x39ff7a); const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.12, 16), millLamp); lamp.position.set(MILL.x + 1.0, 1.52, MILL.z - 0.75); world.add(lamp);
+      blk(0.03, 0.1, 0.03, steel, MILL.x + 1.0, 1.44, MILL.z - 0.75);
+      const runs = [], N = 6;
+      for (let k = 0; k < N; k++) {
+        const c0 = b.now, part = mkPart(), o = { mesh: part, ...PART };
+        const lat = (k % 2 ? 0.16 : -0.16), lvIn = Math.floor((N - 1 - k) / 2), lvOut = Math.floor(k / 2);
+        b.turnTo(PI / 2); b.pick(o, frontOf(rx, rz, PI / 2, 0.42, TH + lvIn * PH_, lat));
+        const j1 = b.cur; b.turnTo(PI); b.place(frontOf(rx, rz, PI, 0.62, 0.785));
+        const tRun = b.now; b.wait(8.0); runs.push([tRun, b.now]);
+        b.pick(o, frontOf(rx, rz, PI, 0.62, 0.785)); const j2 = b.cur;
+        b.turnTo(-PI / 2); b.place(frontOf(rx, rz, -PI / 2, 0.42, TH + lvOut * PH_, -lat));
+        b.turnTo(PI / 2); b.wait(Math.max(0, P - (b.now - c0)));
+        objs.push({ o, job: j1, bot: b, job2: j2, bot2: b });
+      }
+      b.finish(TMAX); millRuns = runs; b.period = P; b.eventList = runs.map((r) => r[0] - 0.6);
+      ANCH.millBot = V3(rx, 1.0, rz);
+    }
+    // ---- R3: hydraulic press with two-hand buttons (press front faces +z; bed top ~0.635, rod travel ~0.3). Cycle 16.9 s.
+    { ST = 'press';
+      const rx = PRESS.x - 0.05, rz = PRESS.z + 0.6, b = nb('press', rx, rz, PI); b.now = -36; const P = 16.9, TH = 0.7;
+      const BED = 0.635; AUD.sups.push({ M: new THREE.Matrix4().makeTranslation(rx, BED - 0.05, PRESS.z), h: [0.42, 0.05, 0.36], name: 'press-bed' });
+      table(rx - 0.62, rz + 0.1, 0, 0.5, 0.5, TH); table(rx + 0.62, rz + 0.1, 0, 0.5, 0.5, TH);
+      const btnM = new THREE.MeshStandardMaterial({ color: 0x1f8f3a, roughness: 0.4, emissive: 0x1f8f3a, emissiveIntensity: 0.2 });
+      const btn = [];
+      ST = 'press-btn';
+      for (const sx of [-1, 1]) {
+        const bx = rx + sx * 0.5, bz = PRESS.z + 0.42;
+        blk(0.12, 0.16, 0.08, yel, bx, 1.0, bz); blk(0.045, 0.92, 0.045, steel, bx, 0.46, bz); blk(0.2, 0.02, 0.2, steel, bx, 0.01, bz);
+        const c = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.03, 20), btnM); c.rotation.x = PI / 2; c.position.set(bx, 1.0, bz + 0.055); world.add(c);
+        btn.push(V3(bx, 1.0, bz + 0.07 + 0.105));   // palm centre ~10 cm in front of the button: the fingertips stop on the green face
+      }
+      ST = 'press';
+      const hits = [], N = 6;
+      for (let k = 0; k < N; k++) {
+        const c0 = b.now, part = mkPart(), o = { mesh: part, ...PART };
+        const lat = (k % 2 ? 0.12 : -0.12) + 0.0, lvIn = Math.floor((N - 1 - k) / 2), lvOut = Math.floor(k / 2);
+        b.turnTo(PI); b.pick(o, frontOf(rx, rz, PI, 0.52, TH + lvIn * 0.14, lat + 0.1)); const j1 = b.cur;
+        b.turnTo(PI / 2); b.place(frontOf(rx, rz, PI / 2, 0.36, BED));
+        const hj = b.hands(btn[0], btn[1], 1.9); hits.push([hj.tPick + 0.1, hj.tPlace]);
+        b.pick(o, frontOf(rx, rz, PI / 2, 0.36, BED)); const j2 = b.cur;
+        b.turnTo(0); b.place(frontOf(rx, rz, 0, 0.52, TH + lvOut * 0.14 * 0.55, -lat - 0.1));
+        b.turnTo(PI); b.wait(Math.max(0, P - (b.now - c0)));
+        o.squashAt = hj.tPick + 0.6;
+        objs.push({ o, job: j1, bot: b, job2: j2, bot2: b });
+      }
+      b.finish(TMAX); pressHits = hits; b.period = P; b.eventList = hits.map((h) => h[0] - 0.1);
+      ANCH.pressBot = V3(rx, 1.0, rz);
+    }
+    // ---- R5: feeds parts onto the cobot cell's fixture; the arm (bolted to the table) picks each one and drops it in a tote. Cycle 8.5 s.
+    { ST = 'cell';
+      const rx = -5.95, rz = 1.6, b = nb('cobot', rx, rz, -PI / 2); b.now = -30; const P = 8.5, TH = 0.76;
+      table(-5.0, rz, 0, 1.1, 0.9, TH);
+      blk(0.3, 0.02, 0.24, steelL, -5.35, TH + 0.01, rz);                 // fixture plate (part sits on it at TH + 0.02)
+      const FIX = TH + 0.02;
+      // input grid tray on the side table
+      table(rx, rz + 0.62, 0, 0.9, 0.5, 0.74); blk(0.86, 0.01, 0.46, tableTop, rx, 0.745, rz + 0.62);
+      const grid = []; for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) grid.push([0.4 + r * 0.17, (c - 1.5) * 0.2]);
+      // tote on the cell table (open box)
+      const TX = -4.6, TZ = rz + 0.3, toteM = new THREE.MeshStandardMaterial({ color: 0x2a5bd7, roughness: 0.6 });
+      ST = 'cell-tote';
+      blk(0.32, 0.01, 0.26, toteM, TX, TH + 0.005, TZ);
+      for (const [dx, dz, w, d] of [[0.155, 0, 0.01, 0.26], [-0.155, 0, 0.01, 0.26], [0, 0.125, 0.32, 0.01], [0, -0.125, 0.32, 0.01]]) blk(w, 0.16, d, toteM, TX + dx, TH + 0.08, TZ + dz);
+      ST = 'cell';
+      cobotArm = createCobot({ white: M.white, dark: M.dark, steel: steelL });
+      cobotArm.root.position.set(-4.72, TH, rz - 0.05); world.add(cobotArm.root);
+      ST = 'cell-mount'; blk(0.24, 0.02, 0.24, M.dark, -4.72, TH + 0.01, rz - 0.05); ST = 'cell';
+      const ev = [], jobs = [];
+      for (let k = 0; k < 8; k++) {
+        const c0 = b.now, part = mkPart(), o = { mesh: part, ...PART };
+        const [gr, gl] = grid[k];
+        b.turnTo(-PI / 2); b.pick(o, frontOf(rx, rz, -PI / 2, gr, 0.75, gl)); const j1 = b.cur;
+        b.turnTo(0); b.place(frontOf(rx, rz, 0, 0.6, FIX)); ev.push(j1.tPlace);
+        b.turnTo(-PI / 2); b.wait(Math.max(0, P - (b.now - c0)));
+        const q = { o, job: j1, bot: b }; objs.push(q); jobs.push(q);
+      }
+      b.finish(TMAX); b.period = P; b.eventList = ev; ANCH.cobotBot = V3(rx, 1.0, rz);
+      // arm program: after each release, reach, grip, lift, swing to the tote, drop, return home (5.6 s)
+      const HOME = V3(-4.95, TH + 0.62, rz - 0.15);
+      cobotCycles = jobs.map((q, k) => {
+        const t0 = q.job.tEnd + 0.15, part = q.job.Wp, pPos = V3().setFromMatrixPosition(part);
+        const grip = pPos.clone().add(V3(0, 0.075, 0)), above = grip.clone().add(V3(0, 0.2, 0));
+        const drop = V3(TX, TH + 0.1 + 0.075, TZ), dropAbove = drop.clone().add(V3(0, 0.26, 0));
+        const W = [[0, HOME, 1], [1.1, above, 1], [1.6, grip, 1], [1.9, grip, 0], [2.4, above, 0], [3.5, dropAbove, 0], [3.9, drop, 0], [4.1, drop, 1], [4.5, dropAbove, 1], [5.6, HOME, 1]];
+        return { k, q, t0, W, tGrip: t0 + 1.9, tDrop: t0 + 4.1 };
+      });
+      cobotBot = b;
+      // the arm holds the part between grip and drop; afterwards the part lies in the tote (only the latest two are kept)
+      jobs.forEach((q, k) => {
+        const cyc = cobotCycles[k];
+        q.cobotHeld = (t) => {
+          const tl = t - (b.shift || 0);
+          if (tl < cyc.tGrip - 0.3) return null;
+          if (tl < cyc.tDrop) { if (tl < cyc.tGrip) return null; return { M: cobotPartM(cyc, tl), held: 'cobot' }; }
+          const nxt = cobotCycles[k + 2]; if (nxt && tl > nxt.tDrop) return { hidden: true };
+          return { M: new THREE.Matrix4().makeRotationY(0).setPosition(cyc.W[6][1].x + ((k % 2) ? 0.05 : -0.05), TH + 0.01 + 0.0, cyc.W[6][1].z), held: null };
+        };
+      });
+    }
+    // ---- R6: inspection: lift each part to the head cameras, tilt it, put it on the PASS tray. Cycle 9 s.
+    { ST = 'insp';
+      const rx = -2.3, rz = 1.55, b = nb('inspect', rx, rz, 0); b.now = -30; const P = 9.0, BT = 0.78;
+      table(rx + 0.58, rz, 0, 0.5, 1.2, BT);
+      scanMat = new THREE.MeshBasicMaterial({ color: 0x5fd8ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+      scanPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.26), scanMat); world.add(scanPlane);
+      const passM = new THREE.MeshStandardMaterial({ color: 0x2bb14c, roughness: 0.5 }), inM = new THREE.MeshStandardMaterial({ color: 0x3a3e44, roughness: 0.5 });
+      const at = (lat) => V3().setFromMatrixPosition(frontOf(rx, rz, 0, 0.5, BT + 0.01, lat));
+      { const p = at(-0.33); blk(0.36, 0.02, 0.44, inM, p.x, p.y, p.z); } { const p = at(0.33); blk(0.36, 0.02, 0.44, passM, p.x, p.y, p.z); }
+      const TT = BT + 0.02, ev = [], N = 12;
+      for (let k = 0; k < N; k++) {
+        const c0 = b.now, part = mkPart(), o = { mesh: part, ...PART };
+        const lv = Math.floor((N - 1 - k) / 2), lo = Math.floor(k / 2), side = k % 2 ? 0.09 : -0.09;
+        b.pick(o, frontOf(rx, rz, 0, 0.5, TT + lv * 0.14, -0.33 + side)); const j = b.cur;
+        const t0 = b.now; b.wait(4.0); const t1 = b.now; ev.push(t0);
+        j.carryFn = (t) => { const u = ss(t0 - 0.4, t0 + 0.3, t) * (1 - ss(t1 - 0.3, t1 + 0.4, t)), spin = ss(t0, t1 - 0.3, t) * PI;
+          return new THREE.Matrix4().makeTranslation(0.38, 0.95 + 0.06 * u, 0).multiply(new THREE.Matrix4().makeRotationZ(Math.sin(spin * 2) * 0.6 * u)).multiply(new THREE.Matrix4().makeBasis(V3(0, 0, 1), V3(0, 1, 0), V3(-1, 0, 0))); };
+        b.place(frontOf(rx, rz, 0, 0.5, TT + lo * 0.14, 0.33 + side));
+        b.wait(Math.max(0, P - (b.now - c0)));
+        inspectJobs.push([t0, t1, b, j]);
+        objs.push({ o, job: j, bot: b });
+      }
+      b.finish(TMAX); b.period = P; b.eventList = ev; ANCH.inspectBot = V3(rx, 1.2, rz);
+    }

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Simple rubber conveyor
+* source:	https://sketchfab.com/3d-models/simple-rubber-conveyor-0819b51c59c3407cb98f0e2c75029e30
+* author:	scailman (https://sketchfab.com/scailman)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Simple rubber conveyor" (https://sketchfab.com/3d-models/simple-rubber-conveyor-0819b51c59c3407cb98f0e2c75029e30) by scailman (https://sketchfab.com/scailman) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

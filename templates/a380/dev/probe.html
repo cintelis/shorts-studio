@@ -1,0 +1,12 @@
+<!doctype html><html><body><canvas></canvas><script type="module">
+import * as THREE from '../lib/three.module.js';
+import { GLTFLoader } from '../lib/jsm/loaders/GLTFLoader.js';
+const g = await new GLTFLoader().loadAsync('../assets/models/shuttle/scene.gltf'); g.scene.updateMatrixWorld(true);
+const xs = [], ys = [], zs = []; const v = new THREE.Vector3();
+g.scene.traverse((o) => { if (!o.isMesh) return; const P = o.geometry.attributes.position; for (let i = 0; i < P.count; i++) { v.set(P.getX(i), P.getY(i), P.getZ(i)).applyMatrix4(o.matrixWorld); xs.push(v.x); ys.push(v.y); zs.push(v.z); } });
+let zmin = 1e9; for (const z of zs) if (z < zmin) zmin = z;
+const cells = {};
+for (let i = 0; i < zs.length; i++) { if (zs[i] > zmin + 4) continue; const k = Math.round(xs[i] * 2) + ',' + Math.round(ys[i] * 2); if (cells[k] === undefined || zs[i] < cells[k]) cells[k] = zs[i]; }
+const rows = []; for (let y = 14; y >= -6; y--) { let s = ''; for (let x = -12; x <= 12; x++) { const c = cells[x + ',' + y]; s += c === undefined ? ' .' : (c - zmin).toFixed(0).padStart(2); } rows.push((y / 2).toFixed(1).padStart(5) + ' ' + s); }
+window.__info = 'zmin ' + zmin.toFixed(2) + ' n ' + zs.length + '\n' + rows.join('\n'); window.__done = 1;
+</script></body></html>

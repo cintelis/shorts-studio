@@ -1,0 +1,12 @@
+<!doctype html><html><body style="margin:0;background:#000"><canvas id="c" width="1080" height="1920"></canvas>
+<script type="module">
+import { createRS25 } from '../lib/rs25.js';
+const m = createRS25(document.getElementById('c'), { width: 1080, height: 1920 });
+await m.load('../assets/');
+const D = { mode: 0, fire: 0.6, tx: 0, ty: 1.5, tz: 0, camAz: 20, camEl: 0, logD: Math.log(16), fov: 30, t: 1.3 };
+const s = Object.assign(D, JSON.parse(decodeURIComponent(location.hash.slice(1) || '{}')));
+if (s.D) s.logD = Math.log(s.D);
+m.render(s); m.render(s);
+window.__info = JSON.stringify({ eng: window.__eng, a: s.anchor ? m.project(s.anchor) : null });
+window.__done = 1;
+</script></body></html>

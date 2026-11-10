@@ -1,0 +1,23 @@
+<!doctype html><html><body style="margin:0;background:#000"><canvas id="c" width="1080" height="1080"></canvas>
+<script type="module">
+import * as THREE from '../lib/three.module.js';
+import { GLTFLoader } from '../lib/jsm/loaders/GLTFLoader.js';
+import { HDRLoader } from '../lib/jsm/loaders/HDRLoader.js';
+const q = new URLSearchParams(location.search);
+const r = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, preserveDrawingBuffer: true });
+r.toneMapping = THREE.ACESFilmicToneMapping;
+const sc = new THREE.Scene(); sc.background = new THREE.Color(0x101216);
+const pm = new THREE.PMREMGenerator(r);
+const hdr = await new Promise((res) => { const l = new HDRLoader(); l.setDataType(THREE.FloatType); l.load('../assets/hdri/empty_warehouse_01_2k.hdr', res); });
+hdr.mapping = THREE.EquirectangularReflectionMapping; sc.environment = pm.fromEquirectangular(hdr).texture;
+const k = new THREE.DirectionalLight(0xffffff, 2); k.position.set(4, 6, 8); sc.add(k);
+const g = await new GLTFLoader().loadAsync(q.get('m'));
+const hide = (q.get('hide')||'').split(',').filter(Boolean); g.scene.traverse((o)=>{ if (hide.some(h=>o.name.includes(h))) o.visible=false; }); sc.add(g.scene); g.scene.updateMatrixWorld(true);
+const b = new THREE.Box3(); g.scene.traverse((o)=>{ if (o.isMesh && o.visible) { let v=true; o.traverseAncestors(a=>{ if(!a.visible) v=false; }); if (v) b.expandByObject(o); } }); const s = b.getSize(new THREE.Vector3()), c = b.getCenter(new THREE.Vector3());
+let tris = 0; const names = []; g.scene.traverse((o) => { if (o.isMesh) { tris += (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) / 3; names.push(o.name + ':' + (o.material.name||'').slice(0,12)); } });
+window.__info = JSON.stringify({ size: s.toArray().map(v=>+v.toFixed(3)), min: b.min.toArray().map(v=>+v.toFixed(3)), max: b.max.toArray().map(v=>+v.toFixed(3)), tris, n: names.length, names: names.slice(0, 40) });
+const cam = new THREE.PerspectiveCamera(30, 1, 0.01, 1e5);
+const R = Math.max(s.x, s.y, s.z); const az = +(q.get('az') || 30) * Math.PI / 180, el = +(q.get('el') || 10) * Math.PI / 180;
+cam.position.set(c.x + R * 2.2 * Math.cos(el) * Math.sin(az), c.y + R * 2.2 * Math.sin(el), c.z + R * 2.2 * Math.cos(el) * Math.cos(az)); cam.lookAt(c);
+r.render(sc, cam); window.__done = 1;
+</script></body></html>

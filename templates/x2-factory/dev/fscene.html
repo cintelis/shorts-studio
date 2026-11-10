@@ -1,0 +1,9 @@
+<!doctype html><html><body style="margin:0;background:#000"><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/sync.js"></script>
+<script type="module">
+import { createFactory } from '../lib/factory.js';
+const m = createFactory(document.getElementById('c'), { width: 1080, height: 1920 });
+await m.load('../assets/');
+window.__render = (s) => { if (s.D) s.logD = Math.log(s.D); const a = performance.now(); m.render(s); return Math.round(performance.now() - a); };
+window.__done = 1;
+</script></body></html>

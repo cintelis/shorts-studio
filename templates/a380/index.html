@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root { --ground: #07080b; --ink: #f6f2ee; --muted: #e4e0da; --blue: #9fc4ff; --lime: #c6ff3d; --red: #ff5a3c;
+              --font-display: "Oswald"; --font-cap: "Montserrat"; --font-mono: "JetBrains Mono"; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: var(--font-display); color: var(--ink); }
+      #bg { position: absolute; inset: 0; background: #000; }
+      #stage { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      #scrim { position: absolute; left: 0; top: 0; width: 1080px; height: 700px; background: linear-gradient(180deg, rgba(4,6,10,0.62) 0%, rgba(4,6,10,0.34) 55%, rgba(4,6,10,0) 100%); }
+      #bscrim { position: absolute; left: 0; top: 1360px; width: 1080px; height: 560px; background: linear-gradient(0deg, rgba(4,6,10,0.45) 0%, rgba(4,6,10,0.2) 60%, rgba(4,6,10,0) 100%); }
+      #endscrim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: rgba(5,7,10,0.78); }
+
+      #hook { position: absolute; left: 30px; right: 30px; top: 110px; text-align: center; text-transform: uppercase; text-shadow: 0 6px 30px rgba(0,0,0,0.85); }
+      #hook .a { font-size: 112px; line-height: 1; font-weight: 700; letter-spacing: 0.01em; }
+      #hook .b { font-size: 196px; line-height: 0.98; font-weight: 700; color: var(--lime); }
+      #hook .c { font-size: 74px; line-height: 1.05; font-weight: 700; color: #fff; margin-top: 18px; }
+      #hook .c span { background: var(--red); padding: 2px 22px 6px; border-radius: 10px; text-shadow: none; }
+
+      .cw { position: absolute; left: 30px; right: 30px; top: 1560px; text-align: center; }
+      .cw span { display: inline-block; font-family: var(--font-cap); font-weight: 900; font-size: 80px; line-height: 1.05; color: #fff;
+                 -webkit-text-stroke: 14px #000; paint-order: stroke fill; letter-spacing: 0.01em; text-shadow: 0 8px 22px rgba(0,0,0,0.55); }
+      .cw b { color: var(--lime); font-weight: 900; }
+
+      .call { position: absolute; left: 40px; right: 40px; top: 120px; text-align: center; text-shadow: 0 6px 28px rgba(0,0,0,0.85); }
+      .call .k { font-family: var(--font-mono); font-size: 34px; letter-spacing: 0.12em; color: var(--muted); font-weight: 700; }
+      .call .big { font-size: 170px; font-weight: 700; line-height: 1; margin-top: 6px; font-variant-numeric: tabular-nums; color: #fff; }
+      .call .big small { font-size: 80px; }
+      .call .sub { font-family: var(--font-mono); font-size: 34px; color: #fff; margin-top: 14px; font-weight: 700; line-height: 1.3; }
+      .call.l .big { color: var(--lime); } .call.r .big { color: var(--red); }
+      .call.sm .big { font-size: 128px; }
+
+      .bars { position: absolute; left: 70px; right: 70px; top: 470px; text-shadow: 0 6px 24px rgba(0,0,0,0.9); }
+      .bars .row { position: relative; height: 104px; margin-top: 14px; }
+      .bars .lbl { position: absolute; left: 0; top: 0; font-family: var(--font-mono); font-size: 32px; font-weight: 700; color: #fff; }
+      .bars .trk { position: absolute; left: 0; right: 0; top: 44px; height: 52px; border-radius: 10px; background: rgba(255,255,255,0.14); }
+      .bars .fill { position: absolute; left: 0; top: 44px; height: 52px; border-radius: 10px; transform-origin: 0 50%; background: #9aa0a8; }
+      .bars .val { position: absolute; right: 0; top: -14px; font-size: 62px; font-weight: 700; font-variant-numeric: tabular-nums; color: #dfe2e6; }
+      .bars .row.hi .fill { background: var(--lime); } .bars .row.hi .val, .bars .row.hi .lbl { color: var(--lime); }
+
+      .lab { position: absolute; left: 0; top: 0; }
+      .lab span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; text-align: center; font-family: var(--font-mono); font-size: 34px; font-weight: 700; line-height: 1.2;
+                  color: var(--lime); background: rgba(8,8,10,0.82); border: 3px solid var(--lime); border-radius: 14px; padding: 6px 16px; }
+      .lab i { position: absolute; height: 4px; background: var(--lime); transform-origin: 0 50%; box-shadow: 0 0 8px rgba(0,0,0,0.7); }
+      .lab.w span { color: #fff; border-color: #fff; } .lab.w i { background: #fff; }
+      .lab.big span { font-size: 46px; padding: 6px 20px; }
+      .lab.n span { font-size: 40px; width: 70px; height: 70px; padding: 0; line-height: 64px; border-radius: 40px; }
+
+      #map { position: absolute; left: 90px; top: 420px; width: 900px; height: 560px; }
+      #map svg { width: 900px; height: 560px; overflow: visible; }
+      #map .city { fill: #fff; stroke: #0a0b0d; stroke-width: 4; }
+      #map .hub { fill: var(--lime); stroke: #0a0b0d; stroke-width: 6; }
+      #map .hl { stroke: var(--lime); stroke-width: 16; stroke-linecap: round; }
+      #map .sp { stroke: rgba(255,255,255,0.85); stroke-width: 6; stroke-linecap: round; }
+      #map .dl { stroke: var(--lime); stroke-width: 6; stroke-linecap: round; }
+      #map text { font-family: var(--font-mono); font-weight: 700; font-size: 30px; fill: #0a0b0d; }
+
+      #seats { position: absolute; left: 115px; top: 520px; width: 850px; }
+      #seats .grid { display: grid; grid-template-columns: repeat(25, 30px); gap: 4px; justify-content: center; background: rgba(6,8,12,0.72); border-radius: 22px; padding: 26px; }
+      #seats .s { width: 30px; height: 30px; border-radius: 7px 7px 4px 4px; background: rgba(255,255,255,0.18); }
+
+      #end { position: absolute; left: 40px; right: 40px; top: 640px; text-align: center; text-shadow: 0 4px 24px rgba(0,0,0,0.85); }
+      #end .t { font-size: 132px; font-weight: 700; line-height: 1.0; letter-spacing: 0.01em; }
+      #end .t .g { color: var(--lime); }
+      #end .cta { display: inline-flex; align-items: center; margin-top: 70px; }
+      #end .cta .sub { font-family: var(--font-mono); font-size: 38px; font-weight: 700; letter-spacing: 0.06em; color: #fff; background: #ff0033; border-radius: 44px; padding: 14px 38px; box-shadow: 0 6px 24px rgba(255,0,51,0.45); }
+      #end .d { font-family: var(--font-mono); font-size: 30px; color: var(--muted); margin-top: 60px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="47.96" data-width="1080" data-height="1920">
+      <div id="bg" class="clip" data-start="0" data-duration="47.96" data-track-index="0"></div>
+      <canvas id="stage" class="clip" data-start="0" data-duration="47.96" data-track-index="1" width="1080" height="1920"></canvas>
+      <div id="scrim" class="clip" data-start="0" data-duration="47.96" data-track-index="5" data-layout-ignore></div>
+      <div id="bscrim" class="clip" data-start="0" data-duration="47.96" data-track-index="5" data-layout-ignore></div>
+      <div id="endscrim" class="clip" data-start="45.26" data-duration="2.7" data-track-index="5" data-layout-ignore></div>
+
+      <div id="hook" class="clip" data-start="0.0" data-duration="4.283" data-track-index="2">
+        <div class="a" id="hook-a">THE BIGGEST AIRLINER</div>
+        <div class="b" id="hook-b">EVER BUILT</div>
+        <div class="c" id="hook-c"><span>AIRBUS STOPPED MAKING IT</span></div>
+      </div>
+
+      <div id="c-name" class="clip call l sm" data-start="4.283" data-duration="5.754" data-track-index="2">
+        <div class="k" id="c-name-k">AIRBUS · FIRST FLIGHT 2005</div>
+        <div class="big" id="c-name-big">A380</div>
+        <div class="sub" id="c-name-sub">525 SEATS TYPICAL · 853 CERTIFIED MAX</div>
+      </div>
+
+      <div id="c-cmp" class="clip call sm" data-start="10.037" data-duration="6.729" data-track-index="2">
+        <div class="k" id="c-cmp-k">TOP VIEW · TO SCALE</div>
+        <div class="big" id="c-cmp-big">A380 <small>vs</small> 777</div>
+      </div>
+
+      <div id="c-bet" class="clip call sm" data-start="16.766" data-duration="4.574" data-track-index="2">
+        <div class="k" id="c-bet-k">AIRBUS'S BET</div>
+        <div class="big" id="c-bet-big">HUB TO HUB</div>
+      </div>
+      <div id="c-p2p" class="clip call l sm" data-start="21.34" data-duration="2.914" data-track-index="2">
+        <div class="k" id="c-p2p-k">WHAT AIRLINES DID</div>
+        <div class="big" id="c-p2p-big">DIRECT</div>
+      </div>
+      <div id="map" class="clip" data-start="16.766" data-duration="7.488" data-track-index="3" data-layout-ignore>
+        <svg viewBox="0 0 900 560">
+          <g id="map-hub">
+            <line class="sp" x1="200" y1="300" x2="60" y2="120" /><line class="sp" x1="200" y1="300" x2="40" y2="330" /><line class="sp" x1="200" y1="300" x2="110" y2="500" />
+            <line class="sp" x1="200" y1="300" x2="300" y2="80" /><line class="sp" x1="200" y1="300" x2="330" y2="520" />
+            <line class="sp" x1="700" y1="260" x2="600" y2="60" /><line class="sp" x1="700" y1="260" x2="860" y2="110" /><line class="sp" x1="700" y1="260" x2="870" y2="380" />
+            <line class="sp" x1="700" y1="260" x2="760" y2="520" /><line class="sp" x1="700" y1="260" x2="560" y2="480" />
+            <line class="hl" id="map-hl" x1="200" y1="300" x2="700" y2="260" />
+          </g>
+          <g id="map-p2p">
+            <line class="dl" x1="60" y1="120" x2="860" y2="110" /><line class="dl" x1="40" y1="330" x2="870" y2="380" /><line class="dl" x1="110" y1="500" x2="600" y2="60" />
+            <line class="dl" x1="300" y1="80" x2="760" y2="520" /><line class="dl" x1="330" y1="520" x2="860" y2="110" /><line class="dl" x1="60" y1="120" x2="560" y2="480" />
+            <line class="dl" x1="40" y1="330" x2="600" y2="60" />
+          </g>
+          <g id="map-nodes">
+            <circle class="city" cx="60" cy="120" r="16" /><circle class="city" cx="40" cy="330" r="16" /><circle class="city" cx="110" cy="500" r="16" /><circle class="city" cx="300" cy="80" r="16" />
+            <circle class="city" cx="330" cy="520" r="16" /><circle class="city" cx="600" cy="60" r="16" /><circle class="city" cx="860" cy="110" r="16" /><circle class="city" cx="870" cy="380" r="16" />
+            <circle class="city" cx="760" cy="520" r="16" /><circle class="city" cx="560" cy="480" r="16" />
+            <g id="map-hubs"><circle class="hub" cx="200" cy="300" r="50" /><circle class="hub" cx="700" cy="260" r="50" />
+              <text x="200" y="311" text-anchor="middle">HUB</text><text x="700" y="271" text-anchor="middle">HUB</text></g>
+          </g>
+        </svg>
+      </div>
+      <div id="c-twin" class="clip call sm" data-start="24.254" data-duration="2.566" data-track-index="2">
+        <div class="k" id="c-twin-k">BOEING 777 · 787 · AIRBUS A350</div>
+        <div class="big" id="c-twin-big">2 ENGINES</div>
+        <div class="sub" id="c-twin-sub">SMALLER · CHEAPER TO FILL</div>
+      </div>
+
+      <div id="c-four" class="clip call r sm" data-start="26.82" data-duration="3.913" data-track-index="2">
+        <div class="k" id="c-four-k">EVERY A380 FLIGHT</div>
+        <div class="big" id="c-four-big">4 ENGINES</div>
+        <div class="sub" id="c-four-sub">MORE FUEL · MORE MAINTENANCE</div>
+      </div>
+
+      <div id="c-seats" class="clip call sm" data-start="30.733" data-duration="2.967" data-track-index="2">
+        <div class="k" id="c-seats-k">TO FILL · EVERY FLIGHT · EVERY DAY</div>
+        <div class="big" id="c-seats-big">525 SEATS</div>
+      </div>
+      <div id="seats" class="clip" data-start="30.733" data-duration="2.967" data-track-index="3" data-layout-ignore>
+        <div class="grid" id="seat-grid"><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s e"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s e"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div></div>
+      </div>
+
+      <div id="c-end" class="clip call sm" data-start="33.7" data-duration="2.816" data-track-index="2">
+        <div class="k" id="c-end-k">AIRBUS · FEBRUARY 2019</div>
+        <div class="big" id="c-end-big">PRODUCTION ENDS</div>
+      </div>
+      <div id="c-251" class="clip call l" data-start="36.516" data-duration="4.099" data-track-index="2">
+        <div class="k" id="c-251-k">DELIVERED · LAST ONE DEC 2021</div>
+        <div class="big" id="c-251-big"><span id="c-251-n">0</span></div>
+        <div class="sub" id="c-251-sub">A380s</div>
+      </div>
+      <div id="c-emi" class="clip call sm" data-start="40.615" data-duration="2.259" data-track-index="2">
+        <div class="k" id="c-emi-k">WHO TOOK THEM</div>
+        <div class="big" id="c-emi-big">EMIRATES</div>
+      </div>
+      <div id="emi" class="clip bars" data-start="40.615" data-duration="2.259" data-track-index="2">
+        <div class="row hi" id="emi-a"><div class="lbl">EMIRATES</div><div class="trk"></div><div class="fill" id="emi-a-fill" style="width:49%"></div><div class="val">123</div></div>
+        <div class="row" id="emi-b"><div class="lbl">EVERY OTHER AIRLINE</div><div class="trk"></div><div class="fill" id="emi-b-fill" style="width:51%"></div><div class="val">128</div></div>
+      </div>
+
+      <div id="lab-up" class="clip lab " data-start="5.793" data-duration="1.230" data-track-index="6" data-layout-ignore><div class="w" id="lab-up-w"><i></i><span>UPPER DECK</span></div></div>
+      <div id="lab-main" class="clip lab " data-start="5.993" data-duration="1.030" data-track-index="6" data-layout-ignore><div class="w" id="lab-main-w"><i></i><span>MAIN DECK</span></div></div>
+      <div id="lab-aname" class="clip lab big" data-start="10.237" data-duration="6.529" data-track-index="6" data-layout-ignore><div class="w" id="lab-aname-w"><i></i><span>A380</span></div></div>
+      <div id="lab-bname" class="clip lab w big" data-start="10.437" data-duration="6.329" data-track-index="6" data-layout-ignore><div class="w" id="lab-bname-w"><i></i><span>777-300ER</span></div></div>
+      <div id="lab-alen" class="clip lab " data-start="13.463" data-duration="3.303" data-track-index="6" data-layout-ignore><div class="w" id="lab-alen-w"><i></i><span>72.7 m long</span></div></div>
+      <div id="lab-blen" class="clip lab w" data-start="13.663" data-duration="3.103" data-track-index="6" data-layout-ignore><div class="w" id="lab-blen-w"><i></i><span>73.9 m long</span></div></div>
+      <div id="lab-aspan" class="clip lab " data-start="15.522" data-duration="1.244" data-track-index="6" data-layout-ignore><div class="w" id="lab-aspan-w"><i></i><span>79.8 m</span></div></div>
+      <div id="lab-bspan" class="clip lab w" data-start="15.722" data-duration="1.044" data-track-index="6" data-layout-ignore><div class="w" id="lab-bspan-w"><i></i><span>64.8 m</span></div></div>
+      <div id="lab-e0" class="clip lab n" data-start="7.423" data-duration="0.750" data-track-index="6" data-layout-ignore><div class="w" id="lab-e0-w"><i></i><span>4</span></div></div>
+      <div id="lab-f0" class="clip lab n" data-start="27.430" data-duration="3.303" data-track-index="6" data-layout-ignore><div class="w" id="lab-f0-w"><i></i><span>4</span></div></div>
+      <div id="lab-e1" class="clip lab n" data-start="7.323" data-duration="0.850" data-track-index="6" data-layout-ignore><div class="w" id="lab-e1-w"><i></i><span>3</span></div></div>
+      <div id="lab-f1" class="clip lab n" data-start="27.310" data-duration="3.423" data-track-index="6" data-layout-ignore><div class="w" id="lab-f1-w"><i></i><span>3</span></div></div>
+      <div id="lab-e2" class="clip lab n" data-start="7.223" data-duration="0.950" data-track-index="6" data-layout-ignore><div class="w" id="lab-e2-w"><i></i><span>2</span></div></div>
+      <div id="lab-f2" class="clip lab n" data-start="27.190" data-duration="3.543" data-track-index="6" data-layout-ignore><div class="w" id="lab-f2-w"><i></i><span>2</span></div></div>
+      <div id="lab-e3" class="clip lab n" data-start="7.123" data-duration="1.050" data-track-index="6" data-layout-ignore><div class="w" id="lab-e3-w"><i></i><span>1</span></div></div>
+      <div id="lab-f3" class="clip lab n" data-start="27.070" data-duration="3.663" data-track-index="6" data-layout-ignore><div class="w" id="lab-f3-w"><i></i><span>1</span></div></div>
+
+      <div id="end" class="clip" data-start="45.36" data-duration="2.6" data-track-index="2">
+        <div class="t" id="end-t"><span class="g">TOO BIG</span><br />FOR THE WAY<br />WE FLY.</div>
+        <div class="cta" id="end-cta"><span class="sub" id="end-sub">SUBSCRIBE</span></div>
+        <div class="d" id="end-d">Unofficial simplified 3D visualisation</div>
+      </div>
+
+      <!-- word-by-word captions, timed from the ElevenLabs voice alignment -->
+      <div id="cw-0" class="clip cw" data-start="0.0" data-duration="0.569" data-track-index="9"><span id="cw-0-t">THE <b>BIGGEST</b></span></div>
+      <div id="cw-1" class="clip cw" data-start="0.569" data-duration="1.59" data-track-index="9"><span id="cw-1-t">AIRLINER EVER BUILT.</span></div>
+      <div id="cw-2" class="clip cw" data-start="2.159" data-duration="0.732" data-track-index="9"><span id="cw-2-t">AND AIRBUS</span></div>
+      <div id="cw-3" class="clip cw" data-start="2.891" data-duration="1.472" data-track-index="9"><span id="cw-3-t"><b>STOPPED</b> MAKING IT.</span></div>
+      <div id="cw-4" class="clip cw" data-start="4.383" data-duration="1.51" data-track-index="9"><span id="cw-4-t">THE <b>A380:</b></span></div>
+      <div id="cw-5" class="clip cw" data-start="5.893" data-duration="1.23" data-track-index="9"><span id="cw-5-t">TWO FULL DECKS,</span></div>
+      <div id="cw-6" class="clip cw" data-start="7.123" data-duration="1.15" data-track-index="9"><span id="cw-6-t">FOUR ENGINES,</span></div>
+      <div id="cw-7" class="clip cw" data-start="8.273" data-duration="1.844" data-track-index="9"><span id="cw-7-t">OVER <b>500</b> SEATS.</span></div>
+      <div id="cw-8" class="clip cw" data-start="10.137" data-duration="0.43" data-track-index="9"><span id="cw-8-t">NEXT TO A</span></div>
+      <div id="cw-9" class="clip cw" data-start="10.567" data-duration="1.753" data-track-index="9"><span id="cw-9-t">BOEING 777,</span></div>
+      <div id="cw-10" class="clip cw" data-start="12.32" data-duration="0.743" data-track-index="9"><span id="cw-10-t">IT'S ACTUALLY</span></div>
+      <div id="cw-11" class="clip cw" data-start="13.063" data-duration="1.23" data-track-index="9"><span id="cw-11-t">A METRE <b>SHORTER.</b></span></div>
+      <div id="cw-12" class="clip cw" data-start="14.293" data-duration="0.79" data-track-index="9"><span id="cw-12-t">BUT ITS WINGS</span></div>
+      <div id="cw-13" class="clip cw" data-start="15.083" data-duration="0.929" data-track-index="9"><span id="cw-13-t">ARE <b>15 METRES</b></span></div>
+      <div id="cw-14" class="clip cw" data-start="16.012" data-duration="0.834" data-track-index="9"><span id="cw-14-t"><b>WIDER.</b></span></div>
+      <div id="cw-15" class="clip cw" data-start="16.866" data-duration="0.766" data-track-index="9"><span id="cw-15-t">AIRBUS BET</span></div>
+      <div id="cw-16" class="clip cw" data-start="17.632" data-duration="1.115" data-track-index="9"><span id="cw-16-t">ON GIANT JETS</span></div>
+      <div id="cw-17" class="clip cw" data-start="18.747" data-duration="0.882" data-track-index="9"><span id="cw-17-t">FLYING BETWEEN</span></div>
+      <div id="cw-18" class="clip cw" data-start="19.629" data-duration="1.811" data-track-index="9"><span id="cw-18-t">HUGE <b>HUB</b> AIRPORTS.</span></div>
+      <div id="cw-19" class="clip cw" data-start="21.44" data-duration="0.941" data-track-index="9"><span id="cw-19-t">INSTEAD,</span></div>
+      <div id="cw-20" class="clip cw" data-start="22.381" data-duration="0.975" data-track-index="9"><span id="cw-20-t">AIRLINES FLEW</span></div>
+      <div id="cw-21" class="clip cw" data-start="23.356" data-duration="0.789" data-track-index="9"><span id="cw-21-t"><b>DIRECT,</b></span></div>
+      <div id="cw-22" class="clip cw" data-start="24.145" data-duration="0.848" data-track-index="9"><span id="cw-22-t">ON EFFICIENT</span></div>
+      <div id="cw-23" class="clip cw" data-start="24.993" data-duration="1.927" data-track-index="9"><span id="cw-23-t"><b>TWIN-ENGINE</b> JETS.</span></div>
+      <div id="cw-24" class="clip cw" data-start="26.92" data-duration="0.952" data-track-index="9"><span id="cw-24-t"><b>FOUR</b> ENGINES</span></div>
+      <div id="cw-25" class="clip cw" data-start="27.872" data-duration="1.196" data-track-index="9"><span id="cw-25-t">BURN MORE FUEL</span></div>
+      <div id="cw-26" class="clip cw" data-start="29.068" data-duration="0.708" data-track-index="9"><span id="cw-26-t">AND NEED MORE</span></div>
+      <div id="cw-27" class="clip cw" data-start="29.776" data-duration="1.057" data-track-index="9"><span id="cw-27-t"><b>MAINTENANCE.</b></span></div>
+      <div id="cw-28" class="clip cw" data-start="30.833" data-duration="1.114" data-track-index="9"><span id="cw-28-t">AND <b>500</b> SEATS</span></div>
+      <div id="cw-29" class="clip cw" data-start="31.947" data-duration="0.743" data-track-index="9"><span id="cw-29-t">ARE HARD TO FILL</span></div>
+      <div id="cw-30" class="clip cw" data-start="32.69" data-duration="1.09" data-track-index="9"><span id="cw-30-t">EVERY DAY.</span></div>
+      <div id="cw-31" class="clip cw" data-start="33.8" data-duration="0.859" data-track-index="9"><span id="cw-31-t">AIRBUS PULLED</span></div>
+      <div id="cw-32" class="clip cw" data-start="34.659" data-duration="0.488" data-track-index="9"><span id="cw-32-t">THE PLUG</span></div>
+      <div id="cw-33" class="clip cw" data-start="35.147" data-duration="1.449" data-track-index="9"><span id="cw-33-t">IN <b>2019.</b></span></div>
+      <div id="cw-34" class="clip cw" data-start="36.616" data-duration="0.581" data-track-index="9"><span id="cw-34-t">THE LAST OF</span></div>
+      <div id="cw-35" class="clip cw" data-start="37.197" data-duration="1.347" data-track-index="9"><span id="cw-35-t"><b>251</b></span></div>
+      <div id="cw-36" class="clip cw" data-start="38.544" data-duration="0.661" data-track-index="9"><span id="cw-36-t">WAS DELIVERED</span></div>
+      <div id="cw-37" class="clip cw" data-start="39.205" data-duration="1.51" data-track-index="9"><span id="cw-37-t">IN <b>2021.</b></span></div>
+      <div id="cw-38" class="clip cw" data-start="40.715" data-duration="0.557" data-track-index="9"><span id="cw-38-t"><b>EMIRATES</b></span></div>
+      <div id="cw-39" class="clip cw" data-start="41.272" data-duration="1.682" data-track-index="9"><span id="cw-39-t">TOOK ALMOST HALF.</span></div>
+      <div id="cw-40" class="clip cw" data-start="42.974" data-duration="0.673" data-track-index="9"><span id="cw-40-t">TOO BIG</span></div>
+      <div id="cw-41" class="clip cw" data-start="43.647" data-duration="0.476" data-track-index="9"><span id="cw-41-t">FOR THE WAY</span></div>
+      <div id="cw-42" class="clip cw" data-start="44.123" data-duration="1.132" data-track-index="9"><span id="cw-42-t">WE <b>FLY.</b></span></div>
+
+      <!-- Voiceover (ElevenLabs "Adam"), ducked music, takeoff roar and a fly-by. Closing hit and loudness are done in mix.py. -->
+      <audio id="a-voice" class="clip" src="assets/voice/voice.mp3" data-start="0.0" data-duration="45.3" data-volume="1.0" data-track-index="20"></audio>
+      <audio id="m-a" class="clip" src="assets/audio/music-a380-duck.mp3" data-start="0.0" data-duration="47.95" data-volume="0.75" data-fade-out="1.0" data-track-index="21"></audio>
+      <audio id="a-takeoff" class="clip" src="assets/audio/takeoff.mp3" data-start="0.0" data-duration="4.78" data-volume="0.55" data-fade-out="0.7" data-track-index="22"></audio>
+      <audio id="a-flyby" class="clip" src="assets/audio/flyby.mp3" data-start="21.54" data-duration="3.8" data-volume="0.45" data-fade-out="0.8" data-track-index="23"></audio>
+    </div>
+
+    <script>
+      const LN = Math.log, DUR = 47.96;
+      const S = { aOn: 1, bOn: 0, ax: 0, ay: 0, az: 0, aYaw: 0, aPitch: 0, aRoll: 0, bx: 0, by: 0, bz: 0, bYaw: 0, bPitch: 0, bRoll: 0, ground: 1,
+                  tx: 0, ty: 8, tz: 0, camAz: -150, camEl: 3, logD: LN(170), fov: 30, camRoll: 0, envRot: 0, sunAz: 140, sunEl: 42, shadowR: 80, sfx: 0, sfz: 0,
+                  dimA: 0, dimB: 0, spanA: 0, spanB: 0, labSide: -1, exp: 1, ao: 1, bloom: 0.12 };
+      const st = gsap.timeline({ paused: true });
+      const move = (t, d, props, ease = "sine.inOut") => st.to(S, { ...props, duration: d, ease }, t);
+      const set = (t, props) => st.set(S, props, t);
+      const sky = (t) => set(t, { ground: 0, ay: 0, ax: 0, az: 0, by: 0, bx: 0, bz: 0, aPitch: 0, bPitch: 0, aRoll: 0, bRoll: 0, envRot: 0 });
+
+      // HOOK: rolling down the runway at ~80 m/s, rotates and lifts off. Camera in front-left, tracking.
+      set(0, { aOn: 1, bOn: 0, ground: 1, ax: 0, az: 130, ay: 0, aPitch: 0, aYaw: 0, tx: 0, tz: 130, ty: 11, camAz: -152, camEl: 2.5, logD: LN(185), fov: 30, sfz: 130, sunAz: 20, sunEl: 34 });
+      move(0, 4.283, { az: -230, tz: -230, sfz: -230 }, "none");
+      move(0, 4.283, { camAz: -112, logD: LN(150), camEl: 4 }, "sine.inOut");
+      move(1.7, 1.4, { aPitch: 8.5 }, "sine.inOut");
+      move(3.1, 4.283 - 3.1, { aPitch: 10.5 }, "sine.out");
+      move(3.0, 4.283 - 3.0, { ay: 12, ty: 19 }, "power2.in");
+      // NAME: parked on the runway, front-quarter orbit; decks labelled; then low front view of the four engines
+      set(4.283, { ax: 0, az: 0, ay: 0, aPitch: 0, sfz: 0, tx: 0, tz: -6, ty: 9, camAz: -146, camEl: 3, logD: LN(150), sunAz: 20, sunEl: 34, labSide: -1 });
+      move(4.283, 7.023 - 4.283, { camAz: -128, logD: LN(135), tz: -2 }, "sine.inOut");
+      set(7.023, { sunAz: 30, sunEl: 32, tx: 0, tz: -10, ty: 5.5, camAz: -180, camEl: 1.0, logD: LN(330), fov: 27 });
+      move(7.023, 8.173 - 7.023, { logD: LN(305) }, "sine.inOut");
+      set(8.173, { sunAz: 60, sunEl: 34, tx: 0, tz: 0, ty: 9, camAz: -96, camEl: 2, logD: LN(170), fov: 30 });
+      move(8.173, 10.037 - 8.173, { camEl: 9, logD: LN(185), camAz: -88 }, "sine.inOut");
+      // COMPARE: both parked on the apron, noses pointing right on screen, tails aligned; top-down
+      set(10.037, { bOn: 1, ax: 513.67, az: -46, aYaw: -90, bx: 512.5, bz: 42, bYaw: -90, tx: 516.93, ty: 0, tz: -5, camAz: 0, camEl: 80, logD: LN(690), fov: 30, sfx: 516.93, sfz: 0, shadowR: 140, sunAz: 150, sunEl: 55, dimA: 0, dimB: 0, spanA: 0, spanB: 0 });
+      move(10.037, 16.766 - 10.037, { logD: LN(670) }, "sine.inOut");
+      move(13.063, 0.9, { dimA: 1, dimB: 1 }, "power2.out");
+      move(15.122, 0.9, { spanA: 1, spanB: 1 }, "power2.out");
+      // BET: A380 cruising, seen from below; route map on top
+      sky(16.766); set(16.766, { aOn: 1, bOn: 0, aYaw: -60, aRoll: -6, dimA: 0, dimB: 0, spanA: 0, spanB: 0, tx: 0, ty: 30, tz: 0, camAz: 160, camEl: -22, logD: LN(235), fov: 30, sunAz: 200, sunEl: 60, shadowR: 80, sfx: 0, sfz: 0, envRot: 40 });
+      move(16.766, 21.34 - 16.766, { camAz: 128, aRoll: -10, logD: LN(190) }, "sine.inOut");
+      // TWINS: a 777 passes
+      set(21.34, { aOn: 0, bOn: 1, bYaw: 70, bRoll: 8, tx: 0, ty: 20, tz: 0, camAz: -30, camEl: -18, logD: LN(170), envRot: 90 });
+      move(21.34, 26.82 - 21.34, { camAz: -75, bRoll: 4, logD: LN(150) }, "sine.inOut");
+      // FOUR ENGINES: low head-on on the runway
+      set(26.82, { ground: 1, aOn: 1, bOn: 0, ax: 0, az: 0, ay: 0, aYaw: 0, aRoll: 0, aPitch: 0, envRot: 0, tx: 0, tz: -12, ty: 9, camAz: 180, camEl: 0.8, logD: LN(330), fov: 27, sunAz: 30, sunEl: 32, sfz: 0 });
+      move(26.82, 30.733 - 26.82, { logD: LN(290), ty: 8.5 }, "sine.inOut");
+      // SEATS: tight side view of the double deck, dimmed under the seat map
+      set(30.733, { sunAz: 60, sunEl: 34, tx: 0, tz: -14, ty: 8, camAz: -92, camEl: 4, logD: LN(120), fov: 30, exp: 0.75 });
+      move(30.733, 33.7 - 30.733, { tz: 6, logD: LN(112) }, "none");
+      // END: alone on the apron, slow crane up and away
+      set(33.7, { ax: 600, az: 0, aYaw: -35, tx: 600, tz: 0, ty: 8, sfx: 600, sfz: 0, camAz: -150, camEl: 6, logD: LN(150), fov: 30, exp: 0.95, sunAz: 30, sunEl: 28, sunG: 0.86, sunB: 0.7, shadowR: 120 });
+      move(33.7, 42.874 - 33.7, { camEl: 24, logD: LN(260), camAz: -175 }, "sine.inOut");
+      // FINAL: climbing away into the sky
+      sky(42.874); set(42.874, { aOn: 1, bOn: 0, aYaw: 0, aPitch: 9, aRoll: 0, tx: 0, ty: 6, tz: 0, camAz: 20, camEl: -12, logD: LN(150), fov: 30, envRot: 200, sunAz: 150, sunEl: 40, sunG: 0.9, sunB: 0.8, exp: 1 });
+      move(42.874, DUR - 42.874, { logD: LN(330), camAz: 5, camEl: -9, aRoll: 4 }, "sine.inOut");
+      st.set({}, {}, DUR);
+      window.aStateAt = (t) => { st.seek(t, false); return { ...S, t }; };
+
+      // ---------- Text ----------
+      const tl = gsap.timeline({ paused: true });
+      const fade = (sel, t, d = 0.3) => tl.fromTo(sel, { opacity: 0 }, { opacity: 1, duration: d }, t);
+      tl.fromTo("#hook-a", { y: -12 }, { y: 0, duration: 0.25, ease: "power3.out" }, 0.0);
+      tl.fromTo("#hook-b", { scale: 1.08 }, { scale: 1, duration: 0.4, ease: "power3.out" }, 0.0);
+      tl.fromTo("#hook-c", { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 2.159);
+      [0.0, 0.569, 2.159, 2.891, 4.383, 5.893, 7.123, 8.273, 10.137, 10.567, 12.32, 13.063, 14.293, 15.083, 16.012, 16.866, 17.632, 18.747, 19.629, 21.44, 22.381, 23.356, 24.145, 24.993, 26.92, 27.872, 29.068, 29.776, 30.833, 31.947, 32.69, 33.8, 34.659, 35.147, 36.616, 37.197, 38.544, 39.205, 40.715, 41.272, 42.974, 43.647, 44.123].forEach((t, k) => tl.fromTo(`#cw-${k}-t`, { scale: 0.86 }, { scale: 1, duration: 0.12, ease: "back.out(2)" }, t));
+      const pop = (k, t) => { tl.fromTo(`#${k}-k`, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.25, ease: "power3.out" }, t); tl.fromTo(`#${k}-big`, { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.25, ease: "power3.out" }, t + 0.05); };
+      const count = (id, to, t, d, dec = 0, ease = "power2.out") => { const o = { n: 0 }; tl.fromTo(o, { n: 0 }, { n: to, duration: d, ease, onUpdate: () => { document.getElementById(id).textContent = o.n.toFixed(dec); } }, t); };
+      const bar = (id, t, d = 0.7) => tl.fromTo(id, { scaleX: 0 }, { scaleX: 1, duration: d, ease: "power3.out" }, t);
+      pop("c-name", 4.283); fade("#c-name-sub", 8.173 - 0.1);
+      pop("c-cmp", 10.037);
+      pop("c-bet", 16.766); fade("#map", 16.766, 0.3);
+      tl.fromTo("#map-p2p", { opacity: 0 }, { opacity: 0, duration: 0.01 }, 16.766);
+      tl.fromTo("#map-hl", { attr: { x2: 200, y2: 300 } }, { attr: { x2: 700, y2: 260 }, duration: 0.8, ease: "power2.inOut" }, 20.14 - 0.6);
+      tl.to("#map-hub", { opacity: 0.12, duration: 0.4 }, 23.356 - 0.4); tl.to("#map-hubs", { opacity: 0, duration: 0.4 }, 23.356 - 0.4);
+      tl.fromTo("#map-p2p", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 23.356 - 0.3);
+      pop("c-p2p", 21.34);
+      pop("c-twin", 24.254); fade("#c-twin-sub", 24.254 + 0.4);
+      pop("c-four", 26.82); fade("#c-four-sub", 27.872 - 0.1);
+      pop("c-seats", 30.733); fade("#seat-grid", 30.733, 0.3);
+      tl.fromTo("#seat-grid .s", { backgroundColor: "rgba(255,255,255,0.18)" }, { backgroundColor: "#c6ff3d", duration: 0.06, stagger: { each: 0.00248 } }, 30.883);
+      tl.to("#seat-grid .s.e", { backgroundColor: "rgba(255,255,255,0.18)", duration: 0.2, stagger: { each: 0.004 } }, 31.837000000000003);
+      pop("c-end", 33.7);
+      pop("c-251", 36.516); count("c-251-n", 251, 36.516 + 0.1, 37.882 - 36.516 + 0.4); fade("#c-251-sub", 37.882);
+      pop("c-emi", 40.615); fade("#emi-a", 40.615 + 0.1, 0.2); bar("#emi-a-fill", 40.615 + 0.15); fade("#emi-b", 40.615 + 0.35, 0.2); bar("#emi-b-fill", 40.615 + 0.4);
+      for (const [k, t] of Object.entries({"lab-up": 5.793, "lab-main": 5.993, "lab-aname": 10.237, "lab-bname": 10.437000000000001, "lab-alen": 13.463000000000001, "lab-blen": 13.663, "lab-aspan": 15.522, "lab-bspan": 15.722, "lab-e0": 7.422999999999999, "lab-f0": 27.43, "lab-e1": 7.3229999999999995, "lab-f1": 27.31, "lab-e2": 7.222999999999999, "lab-f2": 27.19, "lab-e3": 7.122999999999999, "lab-f3": 27.07})) tl.fromTo(`#${k}-w`, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.22, ease: "back.out(2)" }, t);
+      tl.fromTo("#endscrim", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 45.36 - 0.1);
+      tl.fromTo("#end-t", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 45.36 + 0.15);
+      tl.fromTo("#end-cta", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 45.36 + 0.6);
+      fade("#end-d", 45.36 + 0.5);
+      tl.set({}, {}, DUR);
+
+      window.__hf = window.__hf || {};
+      window.__hf.buildReady = window.__hf.buildReady || {};
+      window.__hf.buildReady.a380 = new Promise((resolve) => { window.__aReady = resolve; });
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+    <script type="module">
+      import { createA380 } from "./lib/a380.js";
+      const m = createA380(document.getElementById("stage"), { width: 1080, height: 1920 });
+      const labels = {"lab-up": ["aUpper", -40, -170], "lab-main": ["aMain", -60, 150], "lab-aname": ["aCentre", 0, 0], "lab-bname": ["bCentre", 0, 0], "lab-alen": ["aLen", 0, -48], "lab-blen": ["bLen", 0, 48], "lab-aspan": ["aSpan", -150, 0], "lab-bspan": ["bSpan", -150, 0], "lab-e0": ["aE0", 0, 95], "lab-f0": ["aE0", 0, 95], "lab-e1": ["aE1", 0, 95], "lab-f1": ["aE1", 0, 95], "lab-e2": ["aE2", 0, 95], "lab-f2": ["aE2", 0, 95], "lab-e3": ["aE3", 0, 95], "lab-f3": ["aE3", 0, 95]};
+      function place() {
+        for (const [id, [anchor, dx, dy]] of Object.entries(labels)) {
+          const el = document.getElementById(id);
+          const p = m.project(anchor);
+          if (!p) continue;
+          const span = el.querySelector("span"), line = el.querySelector("i");
+          const hw = span.offsetWidth / 2, sx = Math.max(50 + hw, Math.min(1030 - hw, p.x + dx)), sy = p.y + dy;
+          span.style.left = `${sx}px`; span.style.top = `${sy}px`;
+          const ex = sx - p.x, ey = sy - p.y, len = Math.hypot(ex, ey);
+          const cut = Math.min(len, Math.abs(ey) > 1 ? (span.offsetHeight / 2 + 4) * len / Math.abs(ey) : hw);
+          const L = Math.max(0, len - Math.min(cut, len));
+          line.style.left = `${p.x}px`; line.style.top = `${p.y - 2}px`; line.style.width = `${L}px`;
+          line.style.transform = `rotate(${Math.atan2(ey, ex)}rad)`;
+        }
+      }
+      const renderAt = (t) => { const s = window.aStateAt(t); m.render(s); place(); };
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      await m.load("assets/");
+      renderAt(0);
+      window.__aReady();
+    </script>
+  </body>
+</html>

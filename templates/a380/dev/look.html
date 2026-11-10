@@ -1,0 +1,13 @@
+<!doctype html><html><body style="margin:0"><canvas id="c" width="1080" height="1920"></canvas><script type="module">
+import { createA380 } from '../lib/a380.js';
+const q = new URLSearchParams(location.search);
+if (q.get('brot')) window.B_ROT = +q.get('brot');
+const m = createA380(document.getElementById('c'), { width: 1080, height: 1920 });
+await m.load('../assets/');
+const s = Object.assign({ ax: 0, ay: 0, az: 0, aYaw: 0, bx: 0, bz: 0, bYaw: 0, aOn: 1, bOn: 0, tx: 0, ty: 8, tz: 0, camAz: 60, camEl: 8, logD: Math.log(140), fov: 30, envRot: 0, t: 0 }, JSON.parse(decodeURIComponent(q.get('s') || '{}')));
+if (s.logD > 0 && s.D) s.logD = Math.log(s.D);
+if (s.D) s.logD = Math.log(s.D);
+m.render(s); m.render(s);
+window.__info = (window.__info || '') + ' AL ' + JSON.stringify(m.AL) + ' BL ' + JSON.stringify(m.BL);
+window.__done = 1;
+</script></body></html>

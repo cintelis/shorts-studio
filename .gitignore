@@ -1,0 +1,12 @@
+node_modules/
+.env
+**/renders/
+out/
+templates/out/
+*.log
+**/.hyperframes/
+**/audit-*.txt
+**/audit-chunk*
+**/check.json
+__pycache__/
+.DS_Store

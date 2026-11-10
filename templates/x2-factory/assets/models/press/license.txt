@@ -1,0 +1,11 @@
+Model Information:
+* title:	Hydraulic Press
+* source:	https://sketchfab.com/3d-models/hydraulic-press-0998c9054c3b4c7b9b1f6cf2f2b40d45
+* author:	Scarecrow_original (https://sketchfab.com/Scarecrow_original)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Hydraulic Press" (https://sketchfab.com/3d-models/hydraulic-press-0998c9054c3b4c7b9b1f6cf2f2b40d45) by Scarecrow_original (https://sketchfab.com/Scarecrow_original) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

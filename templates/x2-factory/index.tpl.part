@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root { --ground: #07080b; --ink: #f6f2ee; --muted: #d9d4ce; --cyan: #5fd8ff; --lime: #c6ff3d; --red: #ff5a3c;
+              --font-display: "Oswald"; --font-cap: "Montserrat"; --font-mono: "JetBrains Mono"; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: var(--font-display); color: var(--ink); }
+      #bg { position: absolute; inset: 0; background: #000; }
+      #stage { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      #scrim { position: absolute; left: 0; top: 0; width: 1080px; height: 620px; background: linear-gradient(180deg, rgba(4,5,7,0.62) 0%, rgba(4,5,7,0.3) 62%, rgba(4,5,7,0) 100%); }
+      #scrimB { position: absolute; left: 0; top: 1380px; width: 1080px; height: 540px; background: linear-gradient(0deg, rgba(4,5,7,0.5) 0%, rgba(4,5,7,0) 100%); }
+      #endscrim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: rgba(5,6,8,0.8); }
+
+      #hook { position: absolute; left: 30px; right: 30px; top: 120px; text-align: center; text-transform: uppercase; text-shadow: 0 6px 30px rgba(0,0,0,0.9); }
+      #hook .row { font-size: 168px; line-height: 0.98; font-weight: 700; color: #fff; }
+      #hook .row b { color: var(--lime); font-weight: 700; }
+      #hook .sub { font-family: var(--font-mono); font-size: 46px; font-weight: 700; letter-spacing: 0.12em; color: #fff; margin-top: 22px; }
+      #hook .sub em { font-style: normal; color: var(--lime); }
+
+      .cw { position: absolute; left: 30px; right: 30px; top: 1530px; text-align: center; }
+      .cw span { display: inline-block; font-family: var(--font-cap); font-weight: 900; font-size: 84px; line-height: 1.05; color: #fff;
+                 -webkit-text-stroke: 14px #000; paint-order: stroke fill; letter-spacing: 0.01em; text-shadow: 0 8px 22px rgba(0,0,0,0.55); }
+      .cw b { color: var(--lime); font-weight: 900; }
+
+      .call { position: absolute; left: 50px; right: 50px; top: 120px; text-align: center; text-shadow: 0 6px 28px rgba(0,0,0,0.9); }
+      .call .k { font-family: var(--font-mono); font-size: 36px; letter-spacing: 0.14em; color: var(--muted); font-weight: 700; }
+      .call .big { font-size: 128px; font-weight: 700; line-height: 1; margin-top: 6px; color: #fff; }
+      .call .big b { color: var(--lime); font-weight: 700; }
+
+      #end { position: absolute; left: 60px; right: 60px; top: 640px; text-align: center; text-shadow: 0 4px 24px rgba(0,0,0,0.85); }
+      #end .t { font-size: 124px; font-weight: 700; line-height: 0.98; letter-spacing: 0.01em; color: #fff; }
+      #end .t b { color: var(--lime); }
+      #end .cta { display: inline-flex; align-items: center; margin-top: 56px; }
+      #end .cta .sub { font-family: var(--font-mono); font-size: 38px; font-weight: 700; letter-spacing: 0.06em; color: #fff; background: #ff0033; border-radius: 44px; padding: 14px 38px; box-shadow: 0 6px 24px rgba(255,0,51,0.45); }
+      #end .d { font-family: var(--font-mono); font-size: 28px; color: var(--muted); margin-top: 60px; line-height: 1.4; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="%DUR%" data-width="1080" data-height="1920">
+      <div id="bg" class="clip" data-start="0" data-duration="%DUR%" data-track-index="0"></div>
+      <canvas id="stage" class="clip" data-start="0" data-duration="%DUR%" data-track-index="1" width="1080" height="1920"></canvas>
+      <div id="scrim" class="clip" data-start="0" data-duration="%DUR%" data-track-index="5" data-layout-ignore></div>
+      <div id="scrimB" class="clip" data-start="0" data-duration="%DUR%" data-track-index="5" data-layout-ignore></div>
+      <div id="endscrim" class="clip" data-start="%T_end%" data-duration="%T_endd%" data-track-index="5" data-layout-ignore></div>
+
+      <div id="hook" class="clip" data-start="0.0" data-duration="%T_line%" data-track-index="2">
+        <div class="row" id="hook-a">NO ONE HERE</div>
+        <div class="row" id="hook-b">IS <b>HUMAN.</b></div>
+        <div class="sub" id="hook-sub"><em>10</em> ROBOTS · <em>10</em> JOBS</div>
+      </div>
+%CARDS%
+
+      <div id="end" class="clip" data-start="%T_end%" data-duration="%T_endd%" data-track-index="2">
+        <div class="t" id="end-t">SAME FACTORY.<br><b>NEW WORKERS.</b></div>
+        <div class="cta" id="end-cta"><span class="sub" id="end-sub">SUBSCRIBE</span></div>
+        <div class="d" id="end-d">Unofficial visualisation · demonstration factory</div>
+      </div>
+
+      <!-- word-by-word captions, timed from the ElevenLabs voice alignment -->
+%CAPS%
+
+      <!-- Voiceover (ElevenLabs "Adam"), ducked music, sound effects -->
+%AUDIO%
+    </div>
+
+    <script src="lib/sync.js"></script>
+    <script>
+      const DUR = %DUR%, LN = Math.log, TL = %TJS%;
+      const S = { t: 0, tx: 1.2, ty: 0, tz: -1.2, camAz: -35, camEl: 44, logD: LN(17), fov: 44, cut: 1, ao: 1, bloom: 0.3, aperture: 0, focus: 0, maxblur: 0.006, exp: 1 };
+      const st = gsap.timeline({ paused: true });
+      const to = (t, d, props, ease = "sine.inOut") => st.to(S, { ...props, duration: Math.max(0.01, d), ease }, t);
+      const set = (t, props) => st.set(S, props, t);
+      const shot = (t0, t1, a, b, ease = "sine.inOut") => { const A = { ...a }, B = { ...b }; if (A.D) { A.logD = LN(A.D); delete A.D; } if (B.D) { B.logD = LN(B.D); delete B.D; } set(t0, { cut: 0, fov: 32, ...A }); to(t0, t1 - t0, B, ease); };
+      const r7x = (t) => -8.8 + 0.45 * (t + 4.55), r9z = (t) => -15.5 + 0.45 * (t + 2);
+
+      shot(0, TL.line, { cut: 1, tx: 1.8, ty: 0, tz: -0.8, camAz: -62, camEl: 38, D: 16, fov: 46 }, { camAz: -50, camEl: 35, D: 14.2 });
+      shot(TL.line, TL.mill, { tx: 1.6, ty: 0.85, tz: -1.0, camAz: 34, camEl: 12, D: 4.1 }, { camAz: 22, D: 3.8 });
+      shot(TL.mill, TL.press, { tx: 5.7, ty: 1.0, tz: -3.45, camAz: -45, camEl: 10, D: 3.5 }, { camAz: -40, D: 3.3 });
+      shot(TL.press, TL.shelf, { tx: 4.55, ty: 0.95, tz: 1.3, camAz: 108, camEl: 22, D: 3.4 }, { camAz: 100, D: 3.15 });
+      shot(TL.shelf, TL.inspect, { tx: 9.5, ty: 0.95, tz: -0.6, camAz: -112, camEl: 11, D: 3.7 }, { camAz: -100, D: 3.45 });
+      shot(TL.inspect, TL.cobot, { tx: -2.05, ty: 0.95, tz: 1.55, camAz: 14, camEl: 8, D: 3.2 }, { camAz: 6, D: 3.0 });
+      shot(TL.cobot, TL.bolted, { tx: -5.2, ty: 0.95, tz: 1.6, camAz: 28, camEl: 12, D: 3.9 }, { camAz: 38, D: 3.6 });
+      shot(TL.bolted, TL.walk, { tx: -4.75, ty: 0.95, tz: 1.5, camAz: 140, camEl: 16, D: 2.3 }, { ty: 0.85, D: 2.05 });
+      shot(TL.walk, TL.why, { tx: r7x(TL.walk) + 0.3, ty: 0.85, tz: 4.25, camAz: 58, camEl: 8, D: 4.4 }, { tx: r7x(TL.why) + 0.3, camAz: 40 }, "none");
+      shot(TL.why, TL.buttons, { tx: 2.0, ty: 0.6, tz: -0.8, camAz: -18, camEl: 18, D: 9.5, fov: 38 }, { camAz: -6, D: 8.6 });
+      shot(TL.buttons, TL.doors, { tx: 4.55, ty: 1.0, tz: 1.3, camAz: 112, camEl: 24, D: 2.7 }, { D: 2.5 });
+      shot(TL.doors, TL.shelves, { tx: 5.68, ty: 1.02, tz: -3.45, camAz: -44, camEl: 10, D: 3.1 }, { D: 2.95 });
+      shot(TL.shelves, TL.shaped, { tx: 9.6, ty: 0.95, tz: -0.5, camAz: -150, camEl: 12, D: 3.6 }, { tz: 0.1, camAz: -142, D: 3.4 });
+      shot(TL.shaped, TL.cars, { tx: 1.0, ty: 0.5, tz: -1.0, camAz: -62, camEl: 16, D: 11, fov: 40 }, { camAz: -28, camEl: 22, D: 10 });
+      shot(TL.cars, TL.boxes, { tx: 7.67, ty: 0.85, tz: r9z(TL.cars) + 0.6, camAz: 6, camEl: 8, D: 5.2 }, { tz: r9z(TL.boxes) + 0.6, camAz: 16 }, "none");
+      shot(TL.boxes, TL.same, { tx: -2.75, ty: 0.85, tz: -6.0, camAz: -48, camEl: 12, D: 4.4 }, { camAz: -58, D: 4.1 });
+      shot(TL.same, DUR, { cut: 1, tx: 1.8, ty: 0.2, tz: -0.8, camAz: -40, camEl: 22, D: 9, fov: 44 }, { camAz: -58, camEl: 38, D: 16 }, "sine.inOut");
+      st.set({}, {}, DUR);
+      window.x2StateAt = (t) => { st.seek(t, false); return { ...S, t }; };
+
+      // ---------- Text ----------
+      const tl = gsap.timeline({ paused: true });
+      const fade = (sel, t, d = 0.3) => tl.fromTo(sel, { opacity: 0 }, { opacity: 1, duration: d }, t);
+      tl.fromTo("#hook-a", { scale: 1.06, y: -20 }, { scale: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.0);
+      tl.fromTo("#hook-b", { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" }, 0.75);
+      tl.fromTo("#hook-sub", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, TL.ten);
+      %CAPT%.forEach((t, k) => tl.fromTo(`#cw-${k}-t`, { scale: 0.86 }, { scale: 1, duration: 0.12, ease: "back.out(2)" }, t));
+      for (const [k, t] of Object.entries(%CARDT%)) { tl.fromTo(`#${k}-k`, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.12, ease: "power3.out" }, t); tl.fromTo(`#${k}-big`, { opacity: 0, scale: 1.15 }, { opacity: 1, scale: 1, duration: 0.12, ease: "power3.out" }, t); }
+      tl.fromTo("#endscrim", { opacity: 0 }, { opacity: 1, duration: 0.4 }, TL.end);
+      tl.fromTo("#end-t", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, TL.end + 0.05);
+      tl.fromTo("#end-cta", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, TL.end + 0.5);
+      fade("#end-d", TL.end + 0.3);
+      tl.set({}, {}, DUR);
+
+      window.__hf = window.__hf || {};
+      window.__hf.buildReady = window.__hf.buildReady || {};
+      window.__hf.buildReady.x2 = new Promise((resolve) => { window.__x2Ready = resolve; });
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+    <script type="module">
+      import { createFactory } from "./lib/factory.js";
+      const m = createFactory(document.getElementById("stage"), { width: 1080, height: 1920 });
+      let loaded = false, pending = 0;
+      const renderAt = (t) => { pending = t; if (!loaded) return; m.render(window.x2StateAt(t)); };
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      await m.load("assets/");
+      loaded = true;
+      renderAt(pending);
+      window.__x2Ready();
+    </script>
+  </body>
+</html>
