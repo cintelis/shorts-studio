@@ -3,6 +3,8 @@
 
     python tools/yt-upload.py <video.mp4> <youtube.json> [--privacy private|unlisted|public] [--publish-at ISO8601] [--dry-run]
     python tools/yt-upload.py --check        # only checks the credentials work; uploads nothing
+    python tools/yt-upload.py --thumbnail-only <videoId> <image.jpg>   # set a custom thumbnail (JPEG/PNG under 2 MB)
+    (or add --thumbnail image.jpg to an upload)
 
 youtube.json:
     {
@@ -115,13 +117,30 @@ def upload(video, meta, privacy, publish_at):
     sys.exit('Upload ended without a response')
 
 
+def set_thumbnail(video_id, image):
+    token, _ = access_token()
+    data = open(image, 'rb').read()
+    if len(data) > 2 * 1024 * 1024: sys.exit('Thumbnail must be under 2 MB (save it as JPEG)')
+    ctype = 'image/png' if image.lower().endswith('.png') else 'image/jpeg'
+    req = urllib.request.Request(f'https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId={video_id}',
+                                 data=data, method='POST', headers={'Authorization': f'Bearer {token}', 'Content-Type': ctype})
+    try:
+        with urllib.request.urlopen(req) as r: json.load(r)
+    except urllib.error.HTTPError as e:
+        sys.exit(f'Thumbnail failed: HTTP {e.code} {e.read().decode()[:300]}')
+    print(f'Thumbnail set on {video_id}')
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('video', nargs='?'); ap.add_argument('meta', nargs='?')
     ap.add_argument('--privacy', choices=['private', 'unlisted', 'public'])
     ap.add_argument('--publish-at'); ap.add_argument('--dry-run', action='store_true')
     ap.add_argument('--check', action='store_true')
+    ap.add_argument('--thumbnail'); ap.add_argument('--thumbnail-only', nargs=2, metavar=('VIDEO_ID', 'IMAGE'))
     a = ap.parse_args()
+    if a.thumbnail_only:
+        set_thumbnail(*a.thumbnail_only); return
     if a.check:
         _, scope = access_token()
         print('Credentials OK. Scope:', scope); return
@@ -138,6 +157,7 @@ def main():
     res = upload(a.video, meta, privacy, publish_at)
     vid = res['id']
     print(f'Done: https://youtube.com/shorts/{vid}\nStudio: https://studio.youtube.com/video/{vid}/edit')
+    if a.thumbnail: set_thumbnail(vid, a.thumbnail)
 
 
 if __name__ == '__main__':
