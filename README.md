@@ -41,6 +41,9 @@ HyperFrames runs through `npx` at a pinned version (`hyperframes@0.8.226`); noth
 7. Render: `npx hyperframes@0.8.226 render --workers 1 -o renders/raw.mp4`
 8. Mix and normalise loudness: `python mix.py renders/raw.mp4 ../out/<name>.mp4`
    (target about −14.5 LUFS, with the end card not quieter than the rest).
+9. Upload: write `youtube.json` (title, description, tags, category, privacy, AI use), then
+   `python tools/yt-upload.py ../out/<name>.mp4 templates/my-topic/youtube.json --dry-run`, and run it again without `--dry-run`.
+   Uploads go up **private** by default; publish them in Studio.
 
 ## Production rules that work
 
@@ -65,6 +68,7 @@ HyperFrames runs through `npx` at a pinned version (`hyperframes@0.8.226`); noth
 | --- | --- |
 | `tools/gen-voice.mjs` | ElevenLabs voiceover with character timestamps, giving `voice.mp3` and `words.json` |
 | `tools/gen-audio.mjs` | ElevenLabs music and SFX from `audio.json` (skips files that already exist) |
+| `tools/yt-upload.py` | Uploads to YouTube with all details set (needs `client_secret.json` and `token.json` with a refresh token in `~/.config/youtube`, or `YT_CRED_DIR`); `--check` tests the login |
 | `tools/eleven-key.mjs` | Finds the API key (env var or `.env`) without printing it |
 | `tools/shrink-glb.py`, `tools/strip-glb.py` | Make heavy GLB models smaller |
 | `tools/fetch-refs.mjs`, `tools/make-banner.py` | Reference images and the channel banner |
