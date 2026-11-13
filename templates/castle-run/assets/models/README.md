@@ -30,3 +30,12 @@ without downloading. They aren't used by the scene.
 Code-built parts (cobbles, hall entrance wall, torch flames, banner and stand) are in `lib/castle.js`, and
 the girl's PBR materials are rebuilt in `lib/girlmat.js`, so nothing else needs downloading. The sky HDRI
 (Poly Haven "Belfast Sunset", CC0) and the ElevenLabs audio are in `assets/hdri` and `assets/audio`.
+
+## Re-rendering on another machine (Windows or macOS)
+
+1. From the repo root: `npm install`, then `npm run serve` (serves the repo on port 8765 for the audits).
+2. Download the four models above into `assets/models/`.
+3. In `templates/castle-run`: `./dev/final.sh` runs the chunked audit, footfalls and footsteps, render and
+   loudness mix into `templates/out/79-castle-run-v2.mp4`. Use `SKIP_AUDIT=1 ./dev/final.sh` to skip the audit.
+4. Needs Node 20+, Python 3 with Pillow, ffmpeg and Google Chrome. On macOS Chrome is found in
+   `/Applications`; elsewhere set `CHROME_PATH`. `timeout` is optional (`brew install coreutils` gives `gtimeout`).
