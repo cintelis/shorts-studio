@@ -1,0 +1,14 @@
+<!doctype html><html><body><canvas id="c" width="64" height="64"></canvas><script type="module">
+import { createCastle } from '../lib/castle.js';
+try { const m = createCastle(document.getElementById('c'), { width: 64, height: 64 }); await m.load('../assets/');
+  const F = m.FLAG(); const out = [];
+  for (const t of [19.4, 20.5, 24]) { m.poseAt(t); F.pole.updateMatrixWorld(true);
+    const a = F.pole.localToWorld(new (m.holder.position.constructor)(0, 0, 0)), b = F.pole.localToWorld(new (m.holder.position.constructor)(0, 1, 0)); const ax = b.clone().sub(a).normalize();
+    const dist = (p) => { const d = p.clone().sub(a); return d.sub(ax.clone().multiplyScalar(d.dot(ax))).length(); };
+    const H = m.HANDS.l; const row = H.fingers.map((f) => f.map((bn) => (dist(bn.getWorldPosition(a.clone())) * 1000).toFixed(0)).join('/')).join(' | ');
+    out.push(t + ' hand ' + (dist(H.hand.getWorldPosition(a.clone())) * 1000).toFixed(0) + 'mm fingers k0/k1/k2: ' + row + ' thumb ' + H.thumb.map((bn) => (dist(bn.getWorldPosition(a.clone())) * 1000).toFixed(0)).join('/'));
+  }
+  out.push('centerL ' + JSON.stringify(F.gf.centerL) + ' R ' + F.gf.R + ' axisL ' + JSON.stringify(F.gf.axisL) + ' palmL ' + JSON.stringify(F.gf.palmL));
+  window.__info = out.join('\n'); } catch (e) { window.__info = 'PAGEERROR ' + e.stack; }
+window.__done = 1;
+</script></body></html>

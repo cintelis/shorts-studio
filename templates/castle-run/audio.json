@@ -1,0 +1,184 @@
+{
+ "music": [
+  {
+   "file": "music-castle2.mp3",
+   "plan": {
+    "positive_global_styles": [
+     "epic cinematic orchestral",
+     "fantasy adventure",
+     "driving taiko and orchestral percussion",
+     "heroic brass and soaring strings",
+     "around 128 bpm",
+     "no vocals",
+     "film trailer energy",
+     "medieval fantasy"
+    ],
+    "negative_global_styles": [
+     "vocals",
+     "lyrics",
+     "choir words",
+     "electronic",
+     "dubstep",
+     "lo-fi",
+     "jazz",
+     "pop"
+    ],
+    "sections": [
+     {
+      "section_name": "Gate",
+      "duration_ms": 3300,
+      "lines": [],
+      "positive_local_styles": [
+       "huge percussion hit on the first beat",
+       "driving ostinato strings start immediately",
+       "bold"
+      ],
+      "negative_local_styles": [
+       "slow fade in",
+       "silence"
+      ]
+     },
+     {
+      "section_name": "Courtyard",
+      "duration_ms": 4100,
+      "lines": [],
+      "positive_local_styles": [
+       "galloping strings ostinato",
+       "taiko drums",
+       "momentum"
+      ],
+      "negative_local_styles": [
+       "drop out"
+      ]
+     },
+     {
+      "section_name": "Battlements",
+      "duration_ms": 4900,
+      "lines": [],
+      "positive_local_styles": [
+       "soaring heroic horn melody over the ostinato",
+       "wide and airy",
+       "rising"
+      ],
+      "negative_local_styles": [
+       "quiet"
+      ]
+     },
+     {
+      "section_name": "Hall",
+      "duration_ms": 3500,
+      "lines": [],
+      "positive_local_styles": [
+       "building tension",
+       "rising string crescendo",
+       "pounding drums"
+      ],
+      "negative_local_styles": [
+       "resolution"
+      ]
+     },
+     {
+      "section_name": "Arrival",
+      "duration_ms": 3000,
+      "lines": [],
+      "positive_local_styles": [
+       "final drum hit then a sudden hush",
+       "soft sustained low strings",
+       "anticipation"
+      ],
+      "negative_local_styles": [
+       "loud drums"
+      ]
+     },
+     {
+      "section_name": "Raise",
+      "duration_ms": 3000,
+      "lines": [],
+      "positive_local_styles": [
+       "rising swell of strings and brass building fast",
+       "cymbal roll crescendo"
+      ],
+      "negative_local_styles": [
+       "quiet"
+      ]
+     },
+     {
+      "section_name": "Victory",
+      "duration_ms": 5700,
+      "lines": [],
+      "positive_local_styles": [
+       "triumphant full orchestra fanfare",
+       "heroic brass theme",
+       "majestic and victorious"
+      ],
+      "negative_local_styles": [
+       "sad",
+       "quiet"
+      ]
+     }
+    ]
+   }
+  }
+ ],
+ "sfx": [
+  {
+   "file": "step-stone.mp3",
+   "text": "a single footstep of a light armoured boot on a stone cobblestone courtyard, running, close, crisp, no reverb tail",
+   "seconds": 0.5,
+   "influence": 0.7
+  },
+  {
+   "file": "step-carpet.mp3",
+   "text": "a single running footstep of a boot on a thick carpet over a stone floor, muffled thud, close",
+   "seconds": 0.5,
+   "influence": 0.7
+  },
+  {
+   "file": "wind.mp3",
+   "text": "gusty wind on top of a high stone castle wall at sunset, airy whoosh, distant birds",
+   "seconds": 8,
+   "influence": 0.5,
+   "loop": true
+  },
+  {
+   "file": "courtyard.mp3",
+   "text": "quiet medieval castle courtyard ambience at evening, light breeze, distant birds",
+   "seconds": 8,
+   "influence": 0.4,
+   "loop": true
+  },
+  {
+   "file": "hall.mp3",
+   "text": "large stone great hall interior ambience, torches crackling softly, deep reverberant room tone",
+   "seconds": 10,
+   "influence": 0.5,
+   "loop": true
+  },
+  {
+   "file": "armour.mp3",
+   "text": "light metal armour plates jingling rhythmically while a woman runs, subtle clinks",
+   "seconds": 4,
+   "influence": 0.5,
+   "loop": true
+  },
+  {
+   "file": "breath.mp3",
+   "text": "a young woman catching her breath after a sprint, two soft exhales, close",
+   "seconds": 2.5,
+   "influence": 0.6
+  },
+  {
+   "file": "sword.mp3",
+   "text": "a light steel sword and armour clinking softly in rhythm as a woman runs, subtle metallic jingle",
+   "seconds": 4,
+   "influence": 0.5,
+   "loop": true
+  },
+  {
+   "file": "pole.mp3",
+   "text": "a metal banner pole lifted out of an iron stand: short metallic scrape and a clank",
+   "seconds": 1.5,
+   "influence": 0.6
+  }
+ ]
+}

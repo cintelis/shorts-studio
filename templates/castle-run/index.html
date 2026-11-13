@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; }
+      #bg { position: absolute; inset: 0; background: #000; }
+      #stage { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      #black { position: absolute; inset: 0; background: #000; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="27.5" data-width="1080" data-height="1920">
+      <div id="bg" class="clip" data-start="0" data-duration="27.5" data-track-index="0"></div>
+      <canvas id="stage" class="clip" data-layout-allow-overflow data-start="0" data-duration="27.5" data-track-index="1" width="1080" height="1920"></canvas>
+      <div id="black" class="clip" data-start="0" data-duration="27.5" data-track-index="2" data-layout-ignore></div>
+
+      <audio id="a-music" class="clip" src="assets/audio/music-castle2.mp3" data-start="0" data-duration="27.5" data-volume="0.62" data-fade-out="1.2" data-track-index="10"></audio>
+      <audio id="a-steps" class="clip" src="assets/audio/steps.wav" data-start="0" data-duration="27.5" data-volume="0.85" data-track-index="11"></audio>
+      <audio id="a-yard" class="clip" src="assets/audio/courtyard.mp3" data-start="0" data-duration="7.4" data-volume="0.35" data-fade-out="0.3" data-track-index="12"></audio>
+      <audio id="a-wind" class="clip" src="assets/audio/wind.mp3" data-start="7.4" data-duration="4.9" data-volume="0.45" data-fade-out="0.3" data-track-index="13"></audio>
+      <audio id="a-hall" class="clip" src="assets/audio/hall.mp3" data-start="12.3" data-duration="10.0" data-volume="0.4" data-track-index="14"></audio>
+      <audio id="a-hall2" class="clip" src="assets/audio/hall.mp3" data-start="22.3" data-duration="5.2" data-volume="0.4" data-fade-out="1.0" data-track-index="15"></audio>
+      <audio id="a-sword1" class="clip" src="assets/audio/sword.mp3" data-start="0" data-duration="4.0" data-volume="0.14" data-track-index="16"></audio>
+      <audio id="a-sword2" class="clip" src="assets/audio/sword.mp3" data-start="7.4" data-duration="4.0" data-volume="0.14" data-track-index="17"></audio>
+      <audio id="a-sword3" class="clip" src="assets/audio/sword.mp3" data-start="12.8" data-duration="4.0" data-volume="0.16" data-fade-out="0.8" data-track-index="18"></audio>
+      <audio id="a-breath" class="clip" src="assets/audio/breath.mp3" data-start="18.1" data-duration="2.5" data-volume="0.5" data-track-index="19"></audio>
+      <audio id="a-pole" class="clip" src="assets/audio/pole.mp3" data-start="19.45" data-duration="1.5" data-volume="0.55" data-track-index="20"></audio>
+    </div>
+
+    <script>
+      const DUR = 27.5;
+      const tl = gsap.timeline({ paused: true });
+      tl.set("#black", { opacity: 0 }, 0);
+      tl.to("#black", { opacity: 1, duration: 0.9, ease: "sine.in" }, DUR - 0.9);
+      tl.set({}, {}, DUR);
+      window.__hf = window.__hf || {};
+      window.__hf.buildReady = window.__hf.buildReady || {};
+      window.__hf.buildReady.castle = new Promise((resolve) => { window.__nReady = resolve; });
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+    <script type="module">
+      import { createCastle } from "./lib/castle.js";
+      const m = createCastle(document.getElementById("stage"), { width: 1080, height: 1920 });
+      let ready = false, pending = 0;
+      window.addEventListener("hf-seek", (e) => { pending = e.detail.time; if (ready) m.render(pending); });
+      await m.load("assets/");
+      ready = true; m.render(pending);
+      window.__nReady();
+    </script>
+  </body>
+</html>

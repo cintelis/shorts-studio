@@ -1,0 +1,15 @@
+<!doctype html><html><body><script type="module">
+import * as THREE from '../lib/three.module.js';
+import { GLTFLoader } from '../lib/jsm/loaders/GLTFLoader.js';
+const g = await new GLTFLoader().loadAsync('../assets/models/girl.glb');
+const mixer = new THREE.AnimationMixer(g.scene); const V = () => new THREE.Vector3();
+const B = (n) => g.scene.getObjectByName(n);
+const R = { idx: ['mano_r_079', 'dedoindice_r_083', 'dedoindice_r001_084', 'dedoindice_r002_085', 'dedoindice_r002_end_0114'], mid: ['mano_r_079', 'dedomedio_r_086', 'dedomedio_r001_087', 'dedomedio_r002_088', 'dedomedio_r002_end_0107'], thumb: ['mano_r_079', 'dedoGordo_r_080', 'dedoGordo_r001_081', 'dedoGordo_r002_082', 'dedoGordo_r002_end_0143'] };
+const L = { idx: ['mano_l_058', 'dedoindice_l002_062', 'dedoindice_l001_063', 'dedoindice_l003_064', 'dedoindice_l003_end_0108'], mid: ['mano_l_058', 'dedomedio_l002_065', 'dedomedio_l001_066', 'dedomedio_l003_067', 'dedomedio_l003_end_0123'] };
+const bend = (names) => { const p = names.map((n) => B(n).getWorldPosition(V())); let s = []; for (let i = 1; i < p.length - 1; i++) { const a = p[i].clone().sub(p[i - 1]).normalize(), b = p[i + 1].clone().sub(p[i]).normalize(); s.push(Math.round(Math.acos(Math.min(1, a.dot(b))) * 180 / Math.PI)); } return s.join('/'); };
+const out = [];
+for (const a of g.animations) { if (!/Run|Walk|idle|Idle|Flag|Battle|weapon|resting/i.test(a.name)) continue;
+  mixer.stopAllAction(); const act = mixer.clipAction(a); act.reset().play(); act.time = a.duration * 0.37; mixer.update(0); g.scene.updateMatrixWorld(true);
+  out.push(a.name.replace('sold_fem|', '').padEnd(34) + ' R idx ' + bend(R.idx) + ' mid ' + bend(R.mid) + ' thumb ' + bend(R.thumb) + ' | L idx ' + bend(L.idx) + ' mid ' + bend(L.mid)); }
+window.__info = out.join('\n'); window.__done = 1;
+</script></body></html>

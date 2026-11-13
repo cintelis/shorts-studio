@@ -1,0 +1,30 @@
+<!doctype html><html><body style="margin:0;background:#000"><canvas id="c" width="1080" height="1080"></canvas><script type="module">
+import * as THREE from '../lib/three.module.js';
+import { GLTFLoader } from '../lib/jsm/loaders/GLTFLoader.js';
+import { fixGirlMaterials } from '../lib/girlmat.js';
+import { RoomEnvironment } from '../lib/RoomEnvironment.js';
+const q = new URLSearchParams(location.search);
+const r = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, preserveDrawingBuffer: true }); r.setSize(1080,1080,false);
+r.outputColorSpace = THREE.SRGBColorSpace;
+const sc = new THREE.Scene(); sc.background = new THREE.Color(0x556070);
+sc.add(new THREE.HemisphereLight(0xffffff, 0x445544, 2.0)); const d = new THREE.DirectionalLight(0xffffff, 2.5); d.position.set(2, 4, 3); sc.add(d);
+const g = await new GLTFLoader().loadAsync('../assets/models/girl.glb'); await fixGirlMaterials(g); const pm = new THREE.PMREMGenerator(r); sc.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture; r.toneMapping = THREE.ACESFilmicToneMapping;
+sc.add(g.scene); g.scene.traverse(o => { if (o.isMesh) o.frustumCulled = false; });
+const clipName = q.get('clip') || 'sold_fem|Run-no-Weapon';
+const mixer = new THREE.AnimationMixer(g.scene); const clip = g.animations.find(a => a.name === clipName); const act = mixer.clipAction(clip); act.play();
+const bones = []; g.scene.traverse(o => { if (o.isBone) bones.push(o.name); });
+let info = 'bones ' + bones.length + ': ' + bones.join(',') + '\n';
+const find = (re) => { let b = null; g.scene.traverse(o => { if (!b && o.isBone && re.test(o.name)) b = o; }); return b; };
+const fl = q.get('lf') ? g.scene.getObjectByName(q.get('lf')) : null, fr = q.get('rf') ? g.scene.getObjectByName(q.get('rf')) : null, hip = q.get('hip') ? g.scene.getObjectByName(q.get('hip')) : null;
+const N = 40, T = clip.duration; const w = new THREE.Vector3();
+for (let i = 0; i <= N; i++) { mixer.setTime(T * i / N); g.scene.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(g.scene, true);
+  let row = `t ${(T*i/N).toFixed(3)} box y ${box.min.y.toFixed(3)}..${box.max.y.toFixed(3)} z ${box.min.z.toFixed(2)}..${box.max.z.toFixed(2)}`;
+  for (const [k, b] of [['L', fl], ['R', fr], ['H', hip]]) if (b) { b.getWorldPosition(w); row += ` ${k} ${w.x.toFixed(3)},${w.y.toFixed(3)},${w.z.toFixed(3)}`; }
+  info += row + '\n'; }
+mixer.setTime(+(q.get('t') || 0)); g.scene.updateMatrixWorld(true);
+const box = new THREE.Box3().setFromObject(g.scene, true); const c = box.getCenter(new THREE.Vector3());
+const cam = new THREE.PerspectiveCamera(30, 1, 1, 10000); const az = +(q.get('az') || 30) * Math.PI / 180, D = +(q.get('d') || 4.5);
+cam.position.set(c.x + Math.sin(az) * D, c.y + 0.2, c.z + Math.cos(az) * D); cam.lookAt(c.x, c.y + (+(q.get('ly')||0)), c.z); if (q.get('zoom')) { cam.fov = +q.get('zoom'); cam.updateProjectionMatrix(); }
+r.render(sc, cam); window.__info = info; window.__done = 1;
+</script></body></html>

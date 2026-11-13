@@ -9,6 +9,7 @@ ElevenLabs voiceover, music and sound effects.
 | Folder | What it's good for |
 | --- | --- |
 | `templates/a380` | A vehicle or machine as the hero: model shots on a runway or in the sky, a to-scale comparison of two models, number and map overlays, word captions, voiceover, music and SFX mix. **Start here for most videos.** |
+| `templates/castle-run` | A stylised character (rigged GLB with animation clips) running through a 3D environment: stride-matched run, foot pinning and leg IK, a sword held in the hand, a grab-and-raise flag ending, a camera that keeps clear of the scenery, chunked audits, and footsteps placed on the computed footfalls. **The 3D models aren't in the repo**: download them using the links in `assets/models/README.md`. |
 | `templates/x2-factory` | Several animated robots (URDF humanoids with IK) doing tasks in a scene with props, plus the collision, pose and support **audit** tools (`dev/audit*.mjs`, `lib/audit.js`) that catch floating objects and clipping. |
 
 ## Setup on a new machine

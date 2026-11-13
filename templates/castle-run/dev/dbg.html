@@ -1,0 +1,9 @@
+<!doctype html><html><body><canvas id="c" width="64" height="64"></canvas><script type="module">
+import { createCastle } from '../lib/castle.js';
+const q = new URLSearchParams(location.search);
+try { const m = createCastle(document.getElementById('c'), { width: 64, height: 64 }); await m.load('../assets/');
+  const out = []; for (let t = +q.get('t0'); t <= +q.get('t1'); t += 1 / 30) { const sd = q.get('s') || 'l'; if (q.get('raw')) m.setPose(t, m.charAt(t)); else m.poseAt(t); const leg = m.LEG[sd]; const tp = leg.toe.getWorldPosition(new (m.holder.position.constructor)()); const hp = m.holder.position;
+  out.push(t.toFixed(3) + ' off/h ' + JSON.stringify(m.dbgOff(t, sd)) + ' toe ' + [tp.x, tp.y, tp.z].map(v => (v * 100).toFixed(1)).join(',') + ' heel ' + (() => { const h = leg.heel.getWorldPosition(new (m.holder.position.constructor)()); return [h.x, h.y, h.z].map(v => (v * 100).toFixed(1)).join(','); })() + ' RAW ' + JSON.stringify(m.dbgRaw(t, sd)) + ' root ' + [hp.x, hp.z].map(v => (v * 100).toFixed(1)).join(',')); }
+  window.__info = out.join('\n'); } catch (e) { window.__info = 'PAGEERROR ' + e.stack; }
+window.__done = 1;
+</script></body></html>

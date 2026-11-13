@@ -1,0 +1,11 @@
+import puppeteer from 'puppeteer-core';
+const [,, url, out] = process.argv;
+const b = await puppeteer.launch({ executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: 'new', protocolTimeout: 3600000, args: ['--use-angle=d3d11', '--enable-gpu-rasterization', '--ignore-gpu-blocklist', '--enable-unsafe-swiftshader'] });
+const p = await b.newPage(); await p.setViewport({ width: +(process.env.W || 1080), height: +(process.env.H || 1080) });
+p.on('console', (m) => { if (/error|Error/.test(m.text())) console.log('console:', m.text().slice(0, 300)); });
+p.on('pageerror', (e) => console.log('pageerror', e.message.slice(0, 300)));
+await p.goto(url, { waitUntil: 'load', timeout: 120000 });
+await p.waitForFunction('window.__done', { timeout: 3600000, polling: 1000 });
+console.log(await p.evaluate(() => window.__info || ''));
+await p.screenshot({ path: out, clip: { x: 0, y: 0, width: +(process.env.W || 1080), height: +(process.env.H || 1080) } });
+await b.close();

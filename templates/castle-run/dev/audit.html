@@ -1,0 +1,12 @@
+<!doctype html><html><body><canvas id="c" width="64" height="64"></canvas><script type="module">
+import { createCastle } from '../lib/castle.js';
+import { auditRange } from '../lib/audit.js';
+const q = new URLSearchParams(location.search);
+window.addEventListener('error', (e) => { window.__info = 'PAGEERROR ' + e.message; window.__done = 1; });
+try {
+  const m = createCastle(document.getElementById('c'), { width: 64, height: 64 }); await m.load('../assets/');
+  const r = auditRange(m, +q.get('t0'), +q.get('t1'));
+  window.__info = JSON.stringify(r);
+} catch (e) { window.__info = 'PAGEERROR ' + e.stack; }
+window.__done = 1;
+</script></body></html>

@@ -1,0 +1,14 @@
+<!doctype html><html><body style="margin:0;background:#000"><canvas id="c" width="1080" height="1920"></canvas><script type="module">
+import { createCastle } from '../lib/castle.js';
+const q = new URLSearchParams(location.search);
+const m = createCastle(document.getElementById('c'), { width: 1080, height: 1920 });
+window.onerror = (e) => { window.__info = 'ERR ' + e; window.__done = 1; };
+try {
+  await m.load('../assets/');
+  const t = +(q.get('t') || 0); if (q.get('ext')) Object.assign(m.EXT, JSON.parse(q.get('ext')));
+  m.render(t); m.render(t);
+  const c = m.charAt(t);
+  window.__info = JSON.stringify(m.INFO) + '\nchar ' + c.p.toArray().map(v => v.toFixed(2)) + ' mode ' + c.mode + ' dist ' + c.dist.toFixed(2);
+} catch (e) { window.__info = 'ERR ' + e.stack; }
+window.__done = 1;
+</script></body></html>

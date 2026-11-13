@@ -1,0 +1,17 @@
+<!doctype html><html><body style="margin:0;background:#000"><canvas id="c" width="540" height="960" style="display:none"></canvas><canvas id="o"></canvas><script type="module">
+import { createCastle } from '../lib/castle.js';
+const q = new URLSearchParams(location.search);
+const W = 540, H = 960; const m = createCastle(document.getElementById('c'), { width: W, height: H });
+await m.load('../assets/');
+const ts = q.get('ts').split(',').map(Number); const side = q.get('side');
+if (side) window.__cam = (c) => { const [dx, dy, dz, f] = side.split(':').map(Number); return [c.p.x + dx, c.p.y + dy, c.p.z + dz, c.p.x, c.p.y + 0.7, c.p.z, f]; };
+if (q.get('relax') === '0') m.RELAX.on = false;
+if (q.get('v1')) { m.HP.grip = null; m.SWORD.root.visible = false; const F = m.FLAG(); if (F) { F.group.visible = false; F.pole.visible = false; } }
+if (q.get('hand')) { const sd = q.get('hand'), D = +(q.get('d') || 0.45), up = +(q.get('up') || 0.08);
+  window.__cam = (c) => { const hp = m.HANDS[sd].hand.getWorldPosition(c.p.clone()); const ch = m.girl().getObjectByName('pecho_09').getWorldPosition(c.p.clone());
+    const d = hp.clone().sub(ch); d.y = 0; d.normalize(); const f = new (c.p.constructor)(0, 0, 1).applyQuaternion(m.holder.quaternion); const tip = m.HANDS[sd].fingers[1][2].getWorldPosition(c.p.clone()); const mid = hp.clone().add(tip).multiplyScalar(0.5);
+    const fw = +(q.get('fw') ?? 1), ow = +(q.get('ow') ?? 0.36); return [mid.x + f.x * D * fw + d.x * D * ow, mid.y + up, mid.z + f.z * D * fw + d.z * D * ow, mid.x, mid.y, mid.z, 30]; }; }
+const o = document.getElementById('o'); const cols = Math.min(ts.length, 8); o.width = (W / 2) * cols; o.height = (H / 2) * Math.ceil(ts.length / cols); const g = o.getContext('2d');
+ts.forEach((t, i) => { m.render(t); g.drawImage(document.getElementById('c'), (i % cols) * W / 2, Math.floor(i / cols) * H / 2, W / 2, H / 2); g.fillStyle = '#ff0'; g.font = '18px monospace'; g.fillText(t.toFixed(2), (i % cols) * W / 2 + 4, Math.floor(i / cols) * H / 2 + 18); });
+window.__info = 'ok ' + o.width + 'x' + o.height; window.__done = 1;
+</script></body></html>

@@ -1,0 +1,8 @@
+3D models (all licensed CC BY 4.0, https://creativecommons.org/licenses/by/4.0/):
+- "Fantasy Girl" by loriserio - https://sketchfab.com/3d-models/fantasy-girl-1ca6d15fe2f34bd199252bf73d896e13
+- "Medieval Pentagon Castle" by Sereib - https://sketchfab.com/3d-models/medieval-pentagon-castle-aa352f61de1646209a36f634e6b6dc27
+- "Stylized Sword" by Agata Wilczek - https://sketchfab.com/3d-models/stylized-sword-28897cc3c47a452ebd5624c758b6dce4
+- "Throne Room" by Uğur Yakışık - https://sketchfab.com/3d-models/throne-room-247c37e6a9694ae891398911876f0c14
+Sky: "Belfast Sunset (Pure Sky)" HDRI from Poly Haven (CC0).
+Music and sound effects generated with ElevenLabs.
+Models were rescaled, re-lit and animated for this video; materials of "Fantasy Girl" were converted to PBR. Courtyard cobbles, the hall's entrance wall, torch flames and the banner on its stand were added in code; the sword was re-proportioned to fit her grip.

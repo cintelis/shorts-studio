@@ -1,0 +1,13 @@
+<!doctype html><html><body><script type="module">
+import * as THREE from '../lib/three.module.js';
+import { GLTFLoader } from '../lib/jsm/loaders/GLTFLoader.js';
+const g = await new GLTFLoader().loadAsync('../assets/models/sword.glb'); g.scene.updateMatrixWorld(true);
+const bb = new THREE.Box3().setFromObject(g.scene); const sz = bb.getSize(new THREE.Vector3());
+const ax = sz.x > sz.y && sz.x > sz.z ? 'x' : sz.y > sz.z ? 'y' : 'z';
+// slice profile along the long axis: width of the cross-section in 40 bins
+const N = 40, mins = Array(N).fill(1e9), maxs = Array(N).fill(-1e9), mins2 = Array(N).fill(1e9), maxs2 = Array(N).fill(-1e9); const o = ['x', 'y', 'z'].filter((a) => a !== ax);
+g.scene.traverse((m) => { if (!m.isMesh) return; const p = m.geometry.attributes.position, v = new THREE.Vector3();
+  for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i).applyMatrix4(m.matrixWorld); const k = Math.min(N - 1, Math.floor((v[ax] - bb.min[ax]) / sz[ax] * N)); mins[k] = Math.min(mins[k], v[o[0]]); maxs[k] = Math.max(maxs[k], v[o[0]]); mins2[k] = Math.min(mins2[k], v[o[1]]); maxs2[k] = Math.max(maxs2[k], v[o[1]]); } });
+const rows = []; for (let k = 0; k < N; k++) rows.push(k + ' at ' + (bb.min[ax] + (k + 0.5) / N * sz[ax]).toFixed(3) + ' w' + o[0] + ' ' + (maxs[k] - mins[k]).toFixed(3) + ' w' + o[1] + ' ' + (maxs2[k] - mins2[k]).toFixed(3) + ' c ' + ((maxs[k] + mins[k]) / 2).toFixed(3) + ',' + ((maxs2[k] + mins2[k]) / 2).toFixed(3));
+window.__info = 'bbox ' + bb.min.toArray().map((v) => v.toFixed(3)) + ' / ' + bb.max.toArray().map((v) => v.toFixed(3)) + ' long ' + ax + '\n' + rows.join('\n'); window.__done = 1;
+</script></body></html>

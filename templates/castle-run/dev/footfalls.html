@@ -1,0 +1,13 @@
+<!doctype html><html><body><canvas id="c" width="64" height="64"></canvas><script type="module">
+import { createCastle, DUR } from '../lib/castle.js';
+try {
+  const m = createCastle(document.getElementById('c'), { width: 64, height: 64 }); await m.load('../assets/');
+  const dt = 1 / 120, out = []; const prev = { l: 1, r: 1 };
+  for (let t = 0; t < DUR; t += dt) { const c = m.charAt(t); m.setPose(t, c); const sh = m.shotAt(t);
+    for (const side of ['l', 'r']) { const h = m.soleH(m.LEG[side], c.floor);
+      if (h < 0.015 && prev[side] >= 0.015) out.push([+t.toFixed(3), side, sh.set === 'hall' ? 'carpet' : 'stone', sh.i]);
+      prev[side] = h; } }
+  window.__info = JSON.stringify(out);
+} catch (e) { window.__info = 'PAGEERROR ' + e.stack; }
+window.__done = 1;
+</script></body></html>

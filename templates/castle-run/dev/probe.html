@@ -1,0 +1,31 @@
+<!doctype html><html><body style="margin:0;background:#000"><canvas id="c" width="1080" height="1080"></canvas><script type="module">
+import * as THREE from '../lib/three.module.js';
+import { GLTFLoader } from '../lib/jsm/loaders/GLTFLoader.js';
+const q = new URLSearchParams(location.search);
+const r = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, preserveDrawingBuffer: true });
+r.setSize(1080, 1080, false);
+const sc = new THREE.Scene(); sc.background = new THREE.Color(0x667788);
+sc.add(new THREE.HemisphereLight(0xffffff, 0x444433, 2.2)); const d = new THREE.DirectionalLight(0xffffff, 2); d.position.set(30, 60, 20); sc.add(d);
+const g = await new GLTFLoader().loadAsync('../assets/models/' + q.get('m'));
+sc.add(g.scene); g.scene.updateMatrixWorld(true);
+const bb = new THREE.Box3().setFromObject(g.scene); const sz = bb.getSize(new THREE.Vector3()), c = bb.getCenter(new THREE.Vector3());
+let nm = 0, tris = 0; g.scene.traverse(o => { if (o.isMesh) { nm++; tris += (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) / 3; } });
+let info = `bbox min ${bb.min.toArray().map(v=>v.toFixed(2))} max ${bb.max.toArray().map(v=>v.toFixed(2))} size ${sz.toArray().map(v=>v.toFixed(2))} meshes ${nm} tris ${tris|0}`;
+const cam = new THREE.PerspectiveCamera(+(q.get('fov')||40), 1, 0.05, 5000);
+const v = q.get('v') || 'top';
+const R = Math.max(sz.x, sz.y, sz.z);
+if (v === 'top') { cam.position.set(c.x, c.y + R * 1.6, c.z + 0.001); cam.lookAt(c); }
+else if (v === 'iso') { cam.position.set(c.x + R * 0.9, c.y + R * 0.7, c.z + R * 0.9); cam.lookAt(c); }
+else { const [px,py,pz,tx,ty,tz] = v.split(',').map(Number); cam.position.set(px,py,pz); cam.lookAt(tx,ty,tz); }
+r.render(sc, cam);
+if (q.get('ray')) { // vertical raycasts on a grid: print floor heights
+  const rc = new THREE.Raycaster(); const N = +q.get('ray'); const rows = [];
+  for (let j = 0; j <= N; j++) { const row = []; for (let i = 0; i <= N; i++) { const x = bb.min.x + sz.x * i / N, z = bb.min.z + sz.z * j / N; rc.set(new THREE.Vector3(x, q.get("y0") ? +q.get("y0") : bb.max.y + 1, z), new THREE.Vector3(0, -1, 0)); const h = rc.intersectObject(g.scene, true)[0]; row.push(h ? h.point.y.toFixed(1).padStart(5) : '    .'); } rows.push(row.join('')); }
+  info += '\n' + rows.join('\n');
+}
+if (q.get("line")) { const [x0,z0,x1,z1,n] = q.get("line").split(",").map(Number); const rc = new THREE.Raycaster(); const o=[];
+  for (let i=0;i<=n;i++){ const x=x0+(x1-x0)*i/n, z=z0+(z1-z0)*i/n; rc.set(new THREE.Vector3(x,40,z), new THREE.Vector3(0,-1,0)); const h=rc.intersectObject(g.scene,true)[0]; o.push(x.toFixed(2)+","+z.toFixed(2)+":"+(h?h.point.y.toFixed(2):"-")); }
+  info += " LINE " + o.join(" "); }
+if (q.get("seg")) { const rc = new THREE.Raycaster(); const o=[]; for (const sg of q.get("seg").split(";")) { const [a,b,c,d,e,f] = sg.split(",").map(Number); const A=new THREE.Vector3(a,b,c), B=new THREE.Vector3(d,e,f); const dir=B.clone().sub(A); const L=dir.length(); rc.set(A, dir.normalize()); rc.far=L; const h=rc.intersectObject(g.scene,true)[0]; o.push(h? h.distance.toFixed(2)+"@"+h.point.toArray().map(v=>v.toFixed(2)).join(","): "clear"); } info += " SEG " + o.join(" | "); }
+window.__info = info; window.__done = 1;
+</script></body></html>

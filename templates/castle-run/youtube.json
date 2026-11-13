@@ -1,0 +1,21 @@
+{
+ "title": "Castle Run v2 | Stylised 3D Animation",
+ "description": "A stylised armoured heroine sprints through a medieval castle at sunset, sword in hand: out of the gatehouse, across the courtyard, along the wall walk and into the torch-lit great hall, where she claims the banner.\n\nRendered in code with three.js; the run cycle is locked to the ground so her feet never slide.\n\n3D models (all licensed CC BY 4.0, https://creativecommons.org/licenses/by/4.0/):\n- \"Fantasy Girl\" by loriserio - https://sketchfab.com/3d-models/fantasy-girl-1ca6d15fe2f34bd199252bf73d896e13\n- \"Medieval Pentagon Castle\" by Sereib - https://sketchfab.com/3d-models/medieval-pentagon-castle-aa352f61de1646209a36f634e6b6dc27\n- \"Stylized Sword\" by Agata Wilczek - https://sketchfab.com/3d-models/stylized-sword-28897cc3c47a452ebd5624c758b6dce4\n- \"Throne Room\" by Uğur Yakışık - https://sketchfab.com/3d-models/throne-room-247c37e6a9694ae891398911876f0c14\nSky: \"Belfast Sunset (Pure Sky)\" HDRI from Poly Haven (CC0).\nMusic and sound effects generated with ElevenLabs.\nModels were rescaled, re-lit and animated for this video; materials of \"Fantasy Girl\" were converted to PBR. Courtyard cobbles, the hall's entrance wall, torch flames and the banner on its stand were added in code; the sword was re-proportioned to fit her grip.\n\n#animation #3D #fantasy #castle",
+ "tags": [
+  "3D animation",
+  "fantasy",
+  "medieval castle",
+  "stylised character",
+  "anime style",
+  "heroine",
+  "castle run",
+  "three.js",
+  "short film",
+  "Sketchfab"
+ ],
+ "categoryId": "1",
+ "privacy": "private",
+ "publishAt": null,
+ "aiUsed": false,
+ "madeForKids": false
+}

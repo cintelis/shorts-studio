@@ -1,0 +1,28 @@
+<!doctype html><html><body style="margin:0;background:#000"><canvas id="o" width="1600" height="1600"></canvas><script type="module">
+import * as THREE from '../lib/three.module.js';
+import { GLTFLoader } from '../lib/jsm/loaders/GLTFLoader.js';
+import { fixGirlMaterials } from '../lib/girlmat.js';
+import { RoomEnvironment } from '../lib/RoomEnvironment.js';
+const q = new URLSearchParams(location.search);
+const W = 200, H = 400; const clips = q.get('clips').split(';'); const N = +(q.get('n') || 8);
+const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, preserveDrawingBuffer: true }); r.setSize(W, H, false); r.toneMapping = THREE.ACESFilmicToneMapping;
+const sc = new THREE.Scene(); sc.background = new THREE.Color(0x556070);
+const pm = new THREE.PMREMGenerator(r); sc.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
+const g = await new GLTFLoader().loadAsync('../assets/models/girl.glb'); await fixGirlMaterials(g); sc.add(g.scene); window.__G = g; if (window.__afterLoad) window.__afterLoad(g);
+const grid = new THREE.GridHelper(1000, 20, 0xffffff, 0x888888); sc.add(grid);
+const mixer = new THREE.AnimationMixer(g.scene);
+const o = document.getElementById('o'); o.width = W * N; o.height = H * clips.length; const ctx = o.getContext('2d');
+const cam = new THREE.PerspectiveCamera(30, W / H, 1, 10000); const az = +(q.get('az') || 90) * Math.PI / 180;
+let info = '';
+for (let ci = 0; ci < clips.length; ci++) {
+  const clip = g.animations.find(a => a.name === clips[ci]); mixer.stopAllAction(); const act = mixer.clipAction(clip); act.reset().play();
+  for (let i = 0; i < N; i++) { const t = clip.duration * i / (N - 1) * 0.999; mixer.setTime(t); g.scene.updateMatrixWorld(true);
+    const bone = q.get('bone') ? g.scene.getObjectByName(q.get('bone')) : null;
+    if (bone) { const bp = bone.getWorldPosition(new THREE.Vector3()); const D = +(q.get('d') || 60); cam.position.set(bp.x + Math.sin(az) * D, bp.y + 5, bp.z + Math.cos(az) * D); cam.lookAt(bp); }
+    else { const D = 750; cam.position.set(Math.sin(az) * D, 140, Math.cos(az) * D); cam.lookAt(0, 120, 0); } r.render(sc, cam); ctx.drawImage(cv, i * W, ci * H);
+    ctx.fillStyle = '#ff0'; ctx.font = '16px monospace'; ctx.fillText(t.toFixed(2), i * W + 4, ci * H + 16); }
+  info += clips[ci] + ' ' + clip.duration.toFixed(2) + '\n';
+}
+window.__info = info; window.__done = 1;
+</script></body></html>
